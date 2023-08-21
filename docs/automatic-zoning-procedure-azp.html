@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>11.2 Automatic Zoning Procedure (AZP) | An Introduction to Spatial Data Science with GeoDa</title>
+  <meta name="description" content="GeoDa" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="11.2 Automatic Zoning Procedure (AZP) | An Introduction to Spatial Data Science with GeoDa" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="GeoDa" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="11.2 Automatic Zoning Procedure (AZP) | An Introduction to Spatial Data Science with GeoDa" />
+  
+  <meta name="twitter:description" content="GeoDa" />
+  
+
+<meta name="author" content="Luc Anselin" />
+
+
+<meta name="date" content="2023-08-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="topics-covered-9.html"/>
+<link rel="next" href="max-p-region-problem.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">An Introduction to Spatial Data Science</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="acknowledgments.html"><a href="acknowledgments.html"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="about-the-author.html"><a href="about-the-author.html"><i class="fa fa-check"></i>About the Author</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="overview-of-volume-2.html"><a href="overview-of-volume-2.html"><i class="fa fa-check"></i><b>1.1</b> Overview of Volume 2</a></li>
+<li class="chapter" data-level="1.2" data-path="sample-data-sets.html"><a href="sample-data-sets.html"><i class="fa fa-check"></i><b>1.2</b> Sample Data Sets</a></li>
+</ul></li>
+<li class="part"><span><b>I Dimension Reduction</b></span></li>
+<li class="chapter" data-level="2" data-path="CHPCA.html"><a href="CHPCA.html"><i class="fa fa-check"></i><b>2</b> Principal Component Analysis (PCA)</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="topics-covered.html"><a href="topics-covered.html"><i class="fa fa-check"></i><b>2.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html"><i class="fa fa-check"></i><b>2.2</b> Matrix Algebra Review</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#eigenvalues-and-eigenvectors"><i class="fa fa-check"></i><b>2.2.1</b> Eigenvalues and eigenvectors</a></li>
+<li class="chapter" data-level="2.2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#matrix-decompositions"><i class="fa fa-check"></i><b>2.2.2</b> Matrix decompositions</a>
+<ul>
+<li class="chapter" data-level="2.2.2.1" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#spectraldecomposition"><i class="fa fa-check"></i><b>2.2.2.1</b> Spectral decomposition</a></li>
+<li class="chapter" data-level="2.2.2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#svd"><i class="fa fa-check"></i><b>2.2.2.2</b> Singular value decomposition (SVD)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="principal-components.html"><a href="principal-components.html"><i class="fa fa-check"></i><b>2.3</b> Principal Components</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="principal-components.html"><a href="principal-components.html#implementation"><i class="fa fa-check"></i><b>2.3.1</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="2.3.1.1" data-path="principal-components.html"><a href="principal-components.html#saving-the-principal-components"><i class="fa fa-check"></i><b>2.3.1.1</b> Saving the principal components</a></li>
+<li class="chapter" data-level="2.3.1.2" data-path="principal-components.html"><a href="principal-components.html#saving-the-result-summary"><i class="fa fa-check"></i><b>2.3.1.2</b> Saving the result summary</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3.2" data-path="principal-components.html"><a href="principal-components.html#pcainterpretation"><i class="fa fa-check"></i><b>2.3.2</b> Interpretation</a>
+<ul>
+<li class="chapter" data-level="2.3.2.1" data-path="principal-components.html"><a href="principal-components.html#pcaexplainedvar"><i class="fa fa-check"></i><b>2.3.2.1</b> Explained variance</a></li>
+<li class="chapter" data-level="2.3.2.2" data-path="principal-components.html"><a href="principal-components.html#variable-loadings"><i class="fa fa-check"></i><b>2.3.2.2</b> Variable loadings</a></li>
+<li class="chapter" data-level="2.3.2.3" data-path="principal-components.html"><a href="principal-components.html#loadingsandpca"><i class="fa fa-check"></i><b>2.3.2.3</b> Variable loadings and principal components</a></li>
+<li class="chapter" data-level="2.3.2.4" data-path="principal-components.html"><a href="principal-components.html#substantive-interpretation---squared-correlation"><i class="fa fa-check"></i><b>2.3.2.4</b> Substantive interpretation - squared correlation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="vizpca.html"><a href="vizpca.html"><i class="fa fa-check"></i><b>2.4</b> Visualizing principal components</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="vizpca.html"><a href="vizpca.html#scatter-plot"><i class="fa fa-check"></i><b>2.4.1</b> Scatter plot</a></li>
+<li class="chapter" data-level="2.4.2" data-path="vizpca.html"><a href="vizpca.html#multivariate-decomposition"><i class="fa fa-check"></i><b>2.4.2</b> Multivariate decomposition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html"><i class="fa fa-check"></i><b>2.5</b> Spatializing Principal Components</a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#principal-component-map"><i class="fa fa-check"></i><b>2.5.1</b> Principal component map</a></li>
+<li class="chapter" data-level="2.5.2" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#univariate-cluster-map"><i class="fa fa-check"></i><b>2.5.2</b> Univariate cluster map</a></li>
+<li class="chapter" data-level="2.5.3" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#principal-components-as-multivariate-cluster-maps"><i class="fa fa-check"></i><b>2.5.3</b> Principal components as multivariate cluster maps</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="CHMDS.html"><a href="CHMDS.html"><i class="fa fa-check"></i><b>3</b> Multidimensional Scaling (MDS)</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="topics-covered-1.html"><a href="topics-covered-1.html"><i class="fa fa-check"></i><b>3.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="3.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html"><i class="fa fa-check"></i><b>3.2</b> Classic Metric Scaling</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#mathematical-details"><i class="fa fa-check"></i><b>3.2.1</b> Mathematical Details</a>
+<ul>
+<li class="chapter" data-level="3.2.1.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#classic-metric-mds-and-principal-components"><i class="fa fa-check"></i><b>3.2.1.1</b> Classic metric MDS and principal components</a></li>
+<li class="chapter" data-level="3.2.1.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#poweriteration"><i class="fa fa-check"></i><b>3.2.1.2</b> Power iteration method</a></li>
+<li class="chapter" data-level="3.2.1.3" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#Gramanddissimilarity"><i class="fa fa-check"></i><b>3.2.1.3</b> Dissimilarity matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#MDSimplementation"><i class="fa fa-check"></i><b>3.2.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="3.2.2.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#saving-the-mds-coordinates"><i class="fa fa-check"></i><b>3.2.2.1</b> Saving the MDS coordinates</a></li>
+<li class="chapter" data-level="3.2.2.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#mds-and-pca"><i class="fa fa-check"></i><b>3.2.2.2</b> MDS and PCA</a></li>
+<li class="chapter" data-level="3.2.2.3" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#power-approximation"><i class="fa fa-check"></i><b>3.2.2.3</b> Power approximation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="smacof.html"><a href="smacof.html"><i class="fa fa-check"></i><b>3.3</b> SMACOF</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="smacof.html"><a href="smacof.html#mathematical-details-1"><i class="fa fa-check"></i><b>3.3.1</b> Mathematical Details</a></li>
+<li class="chapter" data-level="3.3.2" data-path="smacof.html"><a href="smacof.html#implementation-1"><i class="fa fa-check"></i><b>3.3.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="3.3.2.1" data-path="smacof.html"><a href="smacof.html#manhattan-block-distance"><i class="fa fa-check"></i><b>3.3.2.1</b> Manhattan block distance</a></li>
+<li class="chapter" data-level="3.3.2.2" data-path="smacof.html"><a href="smacof.html#smacofvsclassic"><i class="fa fa-check"></i><b>3.3.2.2</b> SMACOF vs classic metric MDS</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="vizmds.html"><a href="vizmds.html"><i class="fa fa-check"></i><b>3.4</b> Visualizing MDS</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="vizmds.html"><a href="vizmds.html#mds-and-parallel-coordinate-plot"><i class="fa fa-check"></i><b>3.4.1</b> MDS and Parallel Coordinate Plot</a></li>
+<li class="chapter" data-level="3.4.2" data-path="vizmds.html"><a href="vizmds.html#MDScategories"><i class="fa fa-check"></i><b>3.4.2</b> MDS Scatter Plot with Categories</a></li>
+<li class="chapter" data-level="3.4.3" data-path="vizmds.html"><a href="vizmds.html#d-mds"><i class="fa fa-check"></i><b>3.4.3</b> 3-D MDS</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="spatializemds.html"><a href="spatializemds.html"><i class="fa fa-check"></i><b>3.5</b> Spatializing MDS</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="spatializemds.html"><a href="spatializemds.html#mds-and-map"><i class="fa fa-check"></i><b>3.5.1</b> MDS and Map</a></li>
+<li class="chapter" data-level="3.5.2" data-path="spatializemds.html"><a href="spatializemds.html#mds-spatial-weights"><i class="fa fa-check"></i><b>3.5.2</b> MDS Spatial Weights</a>
+<ul>
+<li class="chapter" data-level="3.5.2.1" data-path="spatializemds.html"><a href="spatializemds.html#attribute-and-geographical-neighbors"><i class="fa fa-check"></i><b>3.5.2.1</b> Attribute and geographical neighbors</a></li>
+<li class="chapter" data-level="3.5.2.2" data-path="spatializemds.html"><a href="spatializemds.html#MDSneighborsimilarity"><i class="fa fa-check"></i><b>3.5.2.2</b> Common coverage percentage</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5.3" data-path="spatializemds.html"><a href="spatializemds.html#mdsneighbormatch"><i class="fa fa-check"></i><b>3.5.3</b> MDS Neighbor Match Test</a></li>
+<li class="chapter" data-level="3.5.4" data-path="spatializemds.html"><a href="spatializemds.html#hdbscan-and-mds"><i class="fa fa-check"></i><b>3.5.4</b> HDBSCAN and MDS</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="CHSNE.html"><a href="CHSNE.html"><i class="fa fa-check"></i><b>4</b> Stochastic Neighbor Embedding (SNE)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="topics-covered-2.html"><a href="topics-covered-2.html"><i class="fa fa-check"></i><b>4.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="4.2" data-path="basics-of-information-theory.html"><a href="basics-of-information-theory.html"><i class="fa fa-check"></i><b>4.2</b> Basics of Information Theory</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="basics-of-information-theory.html"><a href="basics-of-information-theory.html#stochastic-neighbors"><i class="fa fa-check"></i><b>4.2.1</b> Stochastic Neighbors</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="t-sne.html"><a href="t-sne.html"><i class="fa fa-check"></i><b>4.3</b> t-SNE</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="t-sne.html"><a href="t-sne.html#cost-function-and-optimization"><i class="fa fa-check"></i><b>4.3.1</b> Cost Function and Optimization</a></li>
+<li class="chapter" data-level="4.3.2" data-path="t-sne.html"><a href="t-sne.html#large-data-applications-barnes-hut"><i class="fa fa-check"></i><b>4.3.2</b> Large Data Applications (Barnes-Hut)</a>
+<ul>
+<li class="chapter" data-level="4.3.2.1" data-path="t-sne.html"><a href="t-sne.html#simplification-of-p"><i class="fa fa-check"></i><b>4.3.2.1</b> Simplification of <span class="math inline">\(P\)</span></a></li>
+<li class="chapter" data-level="4.3.2.2" data-path="t-sne.html"><a href="t-sne.html#BarnesHutQ"><i class="fa fa-check"></i><b>4.3.2.2</b> Simplification of <span class="math inline">\(Q\)</span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="implementation-2.html"><a href="implementation-2.html"><i class="fa fa-check"></i><b>4.4</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="4.4.0.1" data-path="implementation-2.html"><a href="implementation-2.html#inspecting-the-iterations"><i class="fa fa-check"></i><b>4.4.0.1</b> Inspecting the iterations</a></li>
+<li class="chapter" data-level="4.4.1" data-path="implementation-2.html"><a href="implementation-2.html#tsneanimation"><i class="fa fa-check"></i><b>4.4.1</b> Animation</a></li>
+<li class="chapter" data-level="4.4.2" data-path="implementation-2.html"><a href="implementation-2.html#tuning-the-optimization"><i class="fa fa-check"></i><b>4.4.2</b> Tuning the Optimization</a>
+<ul>
+<li class="chapter" data-level="4.4.2.1" data-path="implementation-2.html"><a href="implementation-2.html#theta"><i class="fa fa-check"></i><b>4.4.2.1</b> Theta</a></li>
+<li class="chapter" data-level="4.4.2.2" data-path="implementation-2.html"><a href="implementation-2.html#perplexity"><i class="fa fa-check"></i><b>4.4.2.2</b> Perplexity</a></li>
+<li class="chapter" data-level="4.4.2.3" data-path="implementation-2.html"><a href="implementation-2.html#iteration-momentum-switch"><i class="fa fa-check"></i><b>4.4.2.3</b> Iteration momentum switch</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4.3" data-path="implementation-2.html"><a href="implementation-2.html#interpretation-and-spatialization"><i class="fa fa-check"></i><b>4.4.3</b> Interpretation and Spatialization</a>
+<ul>
+<li class="chapter" data-level="4.4.3.1" data-path="implementation-2.html"><a href="implementation-2.html#nearest-neighbor-match-test"><i class="fa fa-check"></i><b>4.4.3.1</b> Nearest neighbor match test</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html"><i class="fa fa-check"></i><b>4.5</b> Comparing Distance Preserving Methods</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html#comparing-t-sne-options"><i class="fa fa-check"></i><b>4.5.1</b> Comparing t-SNE Options</a></li>
+<li class="chapter" data-level="4.5.2" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html#local-fit-with-common-coverage-percentage"><i class="fa fa-check"></i><b>4.5.2</b> Local Fit with Common Coverage Percentage</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II Classic Clustering</b></span></li>
+<li class="chapter" data-level="5" data-path="CHhierarchicalclustering.html"><a href="CHhierarchicalclustering.html"><i class="fa fa-check"></i><b>5</b> Hierarchical Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="topics-covered-3.html"><a href="topics-covered-3.html"><i class="fa fa-check"></i><b>5.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="5.2" data-path="dissimilarity.html"><a href="dissimilarity.html"><i class="fa fa-check"></i><b>5.2</b> Dissimilarity</a></li>
+<li class="chapter" data-level="5.3" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html"><i class="fa fa-check"></i><b>5.3</b> Agglomerative Clustering</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#linkage-and-updating-formula"><i class="fa fa-check"></i><b>5.3.1</b> Linkage and Updating Formula</a>
+<ul>
+<li class="chapter" data-level="5.3.1.1" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#single-linkage"><i class="fa fa-check"></i><b>5.3.1.1</b> Single linkage</a></li>
+<li class="chapter" data-level="5.3.1.2" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#complete-linkage"><i class="fa fa-check"></i><b>5.3.1.2</b> Complete linkage</a></li>
+<li class="chapter" data-level="5.3.1.3" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#average-linkage"><i class="fa fa-check"></i><b>5.3.1.3</b> Average linkage</a></li>
+<li class="chapter" data-level="5.3.1.4" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#wards-method"><i class="fa fa-check"></i><b>5.3.1.4</b> Ward’s method</a></li>
+<li class="chapter" data-level="5.3.1.5" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#illustration---single-linkage"><i class="fa fa-check"></i><b>5.3.1.5</b> Illustration - single linkage</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3.2" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#dendrogram"><i class="fa fa-check"></i><b>5.3.2</b> Dendrogram</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="implementation-3.html"><a href="implementation-3.html"><i class="fa fa-check"></i><b>5.4</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="implementation-3.html"><a href="implementation-3.html#hierarchicalvariables"><i class="fa fa-check"></i><b>5.4.1</b> Variable Settings Dialog</a></li>
+<li class="chapter" data-level="5.4.2" data-path="implementation-3.html"><a href="implementation-3.html#wards-method-1"><i class="fa fa-check"></i><b>5.4.2</b> Ward’s method</a></li>
+<li class="chapter" data-level="5.4.3" data-path="implementation-3.html"><a href="implementation-3.html#single-linkage-1"><i class="fa fa-check"></i><b>5.4.3</b> Single linkage</a></li>
+<li class="chapter" data-level="5.4.4" data-path="implementation-3.html"><a href="implementation-3.html#complete-linkage-1"><i class="fa fa-check"></i><b>5.4.4</b> Complete linkage</a></li>
+<li class="chapter" data-level="5.4.5" data-path="implementation-3.html"><a href="implementation-3.html#average-linkage-1"><i class="fa fa-check"></i><b>5.4.5</b> Average linkage</a></li>
+<li class="chapter" data-level="5.4.6" data-path="implementation-3.html"><a href="implementation-3.html#sensitivity-analysis"><i class="fa fa-check"></i><b>5.4.6</b> Sensitivity Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="CHPartioningCluster.html"><a href="CHPartioningCluster.html"><i class="fa fa-check"></i><b>6</b> Partioning Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="topics-covered-4.html"><a href="topics-covered-4.html"><i class="fa fa-check"></i><b>6.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="6.2" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html"><i class="fa fa-check"></i><b>6.2</b> The K Means Algorithm</a>
+<ul>
+<li class="chapter" data-level="" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#mathematical-details-2"><i class="fa fa-check"></i>Mathematical details</a></li>
+<li class="chapter" data-level="6.2.1" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#iterativerelocation"><i class="fa fa-check"></i><b>6.2.1</b> Iterative Relocation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#the-choice-of-k"><i class="fa fa-check"></i><b>6.2.2</b> The Choice of K</a></li>
+<li class="chapter" data-level="6.2.3" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#kmeansplusplus"><i class="fa fa-check"></i><b>6.2.3</b> K-means++</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="implementation-4.html"><a href="implementation-4.html"><i class="fa fa-check"></i><b>6.3</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="implementation-4.html"><a href="implementation-4.html#digressionpca"><i class="fa fa-check"></i><b>6.3.1</b> Digression: Clustering with Dimension Reduction</a></li>
+<li class="chapter" data-level="6.3.2" data-path="implementation-4.html"><a href="implementation-4.html#cluster-parameters"><i class="fa fa-check"></i><b>6.3.2</b> Cluster Parameters</a></li>
+<li class="chapter" data-level="6.3.3" data-path="implementation-4.html"><a href="implementation-4.html#cluster-results"><i class="fa fa-check"></i><b>6.3.3</b> Cluster Results</a>
+<ul>
+<li class="chapter" data-level="6.3.3.1" data-path="implementation-4.html"><a href="implementation-4.html#adjustclusterlabels"><i class="fa fa-check"></i><b>6.3.3.1</b> Adjusting cluster labels</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3.4" data-path="implementation-4.html"><a href="implementation-4.html#kmeansoptions"><i class="fa fa-check"></i><b>6.3.4</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="6.3.4.1" data-path="implementation-4.html"><a href="implementation-4.html#initialization"><i class="fa fa-check"></i><b>6.3.4.1</b> Initialization</a></li>
+<li class="chapter" data-level="6.3.4.2" data-path="implementation-4.html"><a href="implementation-4.html#kmeanselbowplot"><i class="fa fa-check"></i><b>6.3.4.2</b> Selecting k – Elbow plot</a></li>
+<li class="chapter" data-level="6.3.4.3" data-path="implementation-4.html"><a href="implementation-4.html#standardization"><i class="fa fa-check"></i><b>6.3.4.3</b> Standardization</a></li>
+<li class="chapter" data-level="6.3.4.4" data-path="implementation-4.html"><a href="implementation-4.html#kmeansminbound"><i class="fa fa-check"></i><b>6.3.4.4</b> Minimum bound</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html"><i class="fa fa-check"></i><b>6.4</b> Cluster Categories as Variables</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html#conditional-box-plot"><i class="fa fa-check"></i><b>6.4.1</b> Conditional Box Plot</a></li>
+<li class="chapter" data-level="6.4.2" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html#clusteraggregation"><i class="fa fa-check"></i><b>6.4.2</b> Aggregation by Cluster</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="CHAdvancedClustering.html"><a href="CHAdvancedClustering.html"><i class="fa fa-check"></i><b>7</b> Advanced Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="topics-covered-5.html"><a href="topics-covered-5.html"><i class="fa fa-check"></i><b>7.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="7.2" data-path="k-medians.html"><a href="k-medians.html"><i class="fa fa-check"></i><b>7.2</b> K-Medians</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="k-medians.html"><a href="k-medians.html#implementation-5"><i class="fa fa-check"></i><b>7.2.1</b> Implementation</a></li>
+<li class="chapter" data-level="7.2.2" data-path="k-medians.html"><a href="k-medians.html#options-and-sensitivity-analysis"><i class="fa fa-check"></i><b>7.2.2</b> Options and Sensitivity Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="kmedoids.html"><a href="kmedoids.html"><i class="fa fa-check"></i><b>7.3</b> K-Medoids</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="kmedoids.html"><a href="kmedoids.html#the-pam-algorithm-for-k-medoids"><i class="fa fa-check"></i><b>7.3.1</b> The PAM Algorithm for K-Medoids</a>
+<ul>
+<li class="chapter" data-level="7.3.1.1" data-path="kmedoids.html"><a href="kmedoids.html#build"><i class="fa fa-check"></i><b>7.3.1.1</b> Build</a></li>
+<li class="chapter" data-level="7.3.1.2" data-path="kmedoids.html"><a href="kmedoids.html#swap"><i class="fa fa-check"></i><b>7.3.1.2</b> Swap</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.2" data-path="kmedoids.html"><a href="kmedoids.html#improving-on-the-pam-algorithm"><i class="fa fa-check"></i><b>7.3.2</b> Improving on the PAM Algorithm</a>
+<ul>
+<li class="chapter" data-level="7.3.2.1" data-path="kmedoids.html"><a href="kmedoids.html#clara"><i class="fa fa-check"></i><b>7.3.2.1</b> CLARA</a></li>
+<li class="chapter" data-level="7.3.2.2" data-path="kmedoids.html"><a href="kmedoids.html#clarans"><i class="fa fa-check"></i><b>7.3.2.2</b> CLARANS</a></li>
+<li class="chapter" data-level="7.3.2.3" data-path="kmedoids.html"><a href="kmedoids.html#lab"><i class="fa fa-check"></i><b>7.3.2.3</b> LAB</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.3" data-path="kmedoids.html"><a href="kmedoids.html#kmedoidsimplementation"><i class="fa fa-check"></i><b>7.3.3</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="7.3.3.1" data-path="kmedoids.html"><a href="kmedoids.html#cluster-results-1"><i class="fa fa-check"></i><b>7.3.3.1</b> Cluster results</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.4" data-path="kmedoids.html"><a href="kmedoids.html#options-and-sensitivity-analysis-1"><i class="fa fa-check"></i><b>7.3.4</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="7.3.4.1" data-path="kmedoids.html"><a href="kmedoids.html#clara-parameters"><i class="fa fa-check"></i><b>7.3.4.1</b> CLARA parameters</a></li>
+<li class="chapter" data-level="7.3.4.2" data-path="kmedoids.html"><a href="kmedoids.html#clarans-parameters"><i class="fa fa-check"></i><b>7.3.4.2</b> CLARANS parameters</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="CHSpectralClustering.html"><a href="CHSpectralClustering.html"><i class="fa fa-check"></i><b>8</b> Spectral Clustering</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="topics-covered-6.html"><a href="topics-covered-6.html"><i class="fa fa-check"></i><b>8.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="8.2" data-path="spectral-clustering-logic.html"><a href="spectral-clustering-logic.html"><i class="fa fa-check"></i><b>8.2</b> Spectral Clustering Logic</a></li>
+<li class="chapter" data-level="8.3" data-path="clustering-as-a-graph-partitioning-problem.html"><a href="clustering-as-a-graph-partitioning-problem.html"><i class="fa fa-check"></i><b>8.3</b> Clustering as a Graph Partitioning Problem</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="clustering-as-a-graph-partitioning-problem.html"><a href="clustering-as-a-graph-partitioning-problem.html#graph-laplacian"><i class="fa fa-check"></i><b>8.3.1</b> Graph Laplacian</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html"><i class="fa fa-check"></i><b>8.4</b> The Spectral Clustering Algorithm</a>
+<ul>
+<li class="chapter" data-level="8.4.1" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#spectraladjacency"><i class="fa fa-check"></i><b>8.4.1</b> Adjacency matrix</a></li>
+<li class="chapter" data-level="8.4.2" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#clustering-on-the-eigenvectors-of-the-graph-laplacian"><i class="fa fa-check"></i><b>8.4.2</b> Clustering on the Eigenvectors of the Graph Laplacian</a></li>
+<li class="chapter" data-level="8.4.3" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#spectralparameters"><i class="fa fa-check"></i><b>8.4.3</b> Spectral Clustering Parameters</a></li>
+</ul></li>
+<li class="chapter" data-level="8.5" data-path="implementation-6.html"><a href="implementation-6.html"><i class="fa fa-check"></i><b>8.5</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="8.5.1" data-path="implementation-6.html"><a href="implementation-6.html#cluster-results-2"><i class="fa fa-check"></i><b>8.5.1</b> Cluster results</a></li>
+<li class="chapter" data-level="8.5.2" data-path="implementation-6.html"><a href="implementation-6.html#options-and-sensitivity-analysis-2"><i class="fa fa-check"></i><b>8.5.2</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="8.5.2.1" data-path="implementation-6.html"><a href="implementation-6.html#k-nearest-neighbor-affinity-matrix"><i class="fa fa-check"></i><b>8.5.2.1</b> K-nearest neighbor affinity matrix</a></li>
+<li class="chapter" data-level="8.5.2.2" data-path="implementation-6.html"><a href="implementation-6.html#gaussian-kernel-affinity-matrix"><i class="fa fa-check"></i><b>8.5.2.2</b> Gaussian kernel affinity matrix</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>III Spatial Clustering</b></span></li>
+<li class="chapter" data-level="9" data-path="CHspatialclassicclustering.html"><a href="CHspatialclassicclustering.html"><i class="fa fa-check"></i><b>9</b> Spatializing Classic Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="topics-covered-7.html"><a href="topics-covered-7.html"><i class="fa fa-check"></i><b>9.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="9.2" data-path="clustering-on-geographic-coordinates.html"><a href="clustering-on-geographic-coordinates.html"><i class="fa fa-check"></i><b>9.2</b> Clustering on Geographic Coordinates</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="clustering-on-geographic-coordinates.html"><a href="clustering-on-geographic-coordinates.html#implementation-7"><i class="fa fa-check"></i><b>9.2.1</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="including-geographical-coordinates-in-the-feature-set.html"><a href="including-geographical-coordinates-in-the-feature-set.html"><i class="fa fa-check"></i><b>9.3</b> Including Geographical Coordinates in the Feature Set</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="including-geographical-coordinates-in-the-feature-set.html"><a href="including-geographical-coordinates-in-the-feature-set.html#implementation-8"><i class="fa fa-check"></i><b>9.3.1</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html"><i class="fa fa-check"></i><b>9.4</b> Weighted Optimization of Geographical and Attribute Similarity</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#optimization"><i class="fa fa-check"></i><b>9.4.1</b> Optimization</a>
+<ul>
+<li class="chapter" data-level="9.4.1.1" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#connectivity-check"><i class="fa fa-check"></i><b>9.4.1.1</b> Connectivity check</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4.2" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#implementation-9"><i class="fa fa-check"></i><b>9.4.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="constructingspatialcontiguous.html"><a href="constructingspatialcontiguous.html"><i class="fa fa-check"></i><b>9.5</b> Constructing a Spatially Contiguous Solution</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="constructingspatialcontiguous.html"><a href="constructingspatialcontiguous.html#implementation-10"><i class="fa fa-check"></i><b>9.5.1</b> Implementation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="CHspatialhierarchical.html"><a href="CHspatialhierarchical.html"><i class="fa fa-check"></i><b>10</b> Spatially Constrained Clustering - Hierarchical Methods</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="topics-covered-8.html"><a href="topics-covered-8.html"><i class="fa fa-check"></i><b>10.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="10.2" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html"><i class="fa fa-check"></i><b>10.2</b> Spatially Constrained Hierarchical Clustering (SCHC)</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schcalgillustration"><i class="fa fa-check"></i><b>10.2.1</b> The Algorithm</a>
+<ul>
+<li class="chapter" data-level="10.2.1.1" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schccompletelinkage"><i class="fa fa-check"></i><b>10.2.1.1</b> SCHC Complete Linkage</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2.2" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schcimplement"><i class="fa fa-check"></i><b>10.2.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="skater.html"><a href="skater.html"><i class="fa fa-check"></i><b>10.3</b> SKATER</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="skater.html"><a href="skater.html#skaterpruning"><i class="fa fa-check"></i><b>10.3.1</b> Pruning the Minimum Spanning Tree</a></li>
+<li class="chapter" data-level="10.3.2" data-path="skater.html"><a href="skater.html#implementation-11"><i class="fa fa-check"></i><b>10.3.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="10.3.2.1" data-path="skater.html"><a href="skater.html#saveMST"><i class="fa fa-check"></i><b>10.3.2.1</b> Saving the Minimum Spanning Tree</a></li>
+<li class="chapter" data-level="10.3.2.2" data-path="skater.html"><a href="skater.html#setskaterminsize"><i class="fa fa-check"></i><b>10.3.2.2</b> Setting a minimum cluster size</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="redcap.html"><a href="redcap.html"><i class="fa fa-check"></i><b>10.4</b> REDCAP</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="redcap.html"><a href="redcap.html#illustration---fullorder-completelinkage"><i class="fa fa-check"></i><b>10.4.1</b> Illustration - FullOrder-CompleteLinkage</a></li>
+<li class="chapter" data-level="10.4.2" data-path="redcap.html"><a href="redcap.html#redcapimplementation"><i class="fa fa-check"></i><b>10.4.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="assessment.html"><a href="assessment.html"><i class="fa fa-check"></i><b>10.5</b> Assessment</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="CHspatialpartition.html"><a href="CHspatialpartition.html"><i class="fa fa-check"></i><b>11</b> Spatially Constrained Clustering - Partitioning Methods</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="topics-covered-9.html"><a href="topics-covered-9.html"><i class="fa fa-check"></i><b>11.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="11.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html"><i class="fa fa-check"></i><b>11.2</b> Automatic Zoning Procedure (AZP)</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#azp-heuristic"><i class="fa fa-check"></i><b>11.2.1</b> AZP Heuristic</a>
+<ul>
+<li class="chapter" data-level="11.2.1.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#illustration"><i class="fa fa-check"></i><b>11.2.1.1</b> Illustration</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#tabu-search"><i class="fa fa-check"></i><b>11.2.2</b> Tabu Search</a></li>
+<li class="chapter" data-level="11.2.3" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#simulated-annealing"><i class="fa fa-check"></i><b>11.2.3</b> Simulated Annealing</a></li>
+<li class="chapter" data-level="11.2.4" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#arisel"><i class="fa fa-check"></i><b>11.2.4</b> ARiSeL</a></li>
+<li class="chapter" data-level="11.2.5" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#using-the-outcome-from-another-cluster-routine-as-the-initial-feasible-region"><i class="fa fa-check"></i><b>11.2.5</b> Using the Outcome from Another Cluster Routine as the Initial Feasible Region</a></li>
+<li class="chapter" data-level="11.2.6" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#implementation-12"><i class="fa fa-check"></i><b>11.2.6</b> Implementation</a></li>
+<li class="chapter" data-level="11.2.7" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#search-options"><i class="fa fa-check"></i><b>11.2.7</b> Search Options</a>
+<ul>
+<li class="chapter" data-level="11.2.7.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#local-search"><i class="fa fa-check"></i><b>11.2.7.1</b> Local Search</a></li>
+<li class="chapter" data-level="11.2.7.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#tabu-search-1"><i class="fa fa-check"></i><b>11.2.7.2</b> Tabu search</a></li>
+<li class="chapter" data-level="11.2.7.3" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#simulated-annealing-1"><i class="fa fa-check"></i><b>11.2.7.3</b> Simulated annealing</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2.8" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#initialization-options"><i class="fa fa-check"></i><b>11.2.8</b> Initialization Options</a>
+<ul>
+<li class="chapter" data-level="11.2.8.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#arisel-1"><i class="fa fa-check"></i><b>11.2.8.1</b> ARiSeL</a></li>
+<li class="chapter" data-level="11.2.8.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#initial-regions"><i class="fa fa-check"></i><b>11.2.8.2</b> Initial regions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html"><i class="fa fa-check"></i><b>11.3</b> Max-P Region Problem</a>
+<ul>
+<li class="chapter" data-level="11.3.1" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#max-p-heuristic"><i class="fa fa-check"></i><b>11.3.1</b> Max-p Heuristic</a>
+<ul>
+<li class="chapter" data-level="11.3.1.1" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#illustration-1"><i class="fa fa-check"></i><b>11.3.1.1</b> Illustration</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3.2" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#implementation-13"><i class="fa fa-check"></i><b>11.3.2</b> Implementation</a></li>
+<li class="chapter" data-level="11.3.3" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#sensitivity-analysis-1"><i class="fa fa-check"></i><b>11.3.3</b> Sensitivity Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>IV Assessment</b></span></li>
+<li class="chapter" data-level="12" data-path="CHclustervalidation.html"><a href="CHclustervalidation.html"><i class="fa fa-check"></i><b>12</b> Cluster Validation</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="topics-covered-10.html"><a href="topics-covered-10.html"><i class="fa fa-check"></i><b>12.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="12.2" data-path="internal-validity.html"><a href="internal-validity.html"><i class="fa fa-check"></i><b>12.2</b> Internal Validity</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="internal-validity.html"><a href="internal-validity.html#traditional-measures-of-fit"><i class="fa fa-check"></i><b>12.2.1</b> Traditional Measures of Fit</a></li>
+<li class="chapter" data-level="12.2.2" data-path="internal-validity.html"><a href="internal-validity.html#clusterbalance"><i class="fa fa-check"></i><b>12.2.2</b> Balance</a></li>
+<li class="chapter" data-level="12.2.3" data-path="internal-validity.html"><a href="internal-validity.html#join-count-ratio"><i class="fa fa-check"></i><b>12.2.3</b> Join Count Ratio</a></li>
+<li class="chapter" data-level="12.2.4" data-path="internal-validity.html"><a href="internal-validity.html#compactness"><i class="fa fa-check"></i><b>12.2.4</b> Compactness</a></li>
+<li class="chapter" data-level="12.2.5" data-path="internal-validity.html"><a href="internal-validity.html#connectedness"><i class="fa fa-check"></i><b>12.2.5</b> Connectedness</a></li>
+<li class="chapter" data-level="12.2.6" data-path="internal-validity.html"><a href="internal-validity.html#implementation-14"><i class="fa fa-check"></i><b>12.2.6</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="external-validity.html"><a href="external-validity.html"><i class="fa fa-check"></i><b>12.3</b> External Validity</a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="external-validity.html"><a href="external-validity.html#classic-measures"><i class="fa fa-check"></i><b>12.3.1</b> Classic Measures</a>
+<ul>
+<li class="chapter" data-level="12.3.1.1" data-path="external-validity.html"><a href="external-validity.html#adjusted-rand-index"><i class="fa fa-check"></i><b>12.3.1.1</b> Adjusted Rand Index</a></li>
+<li class="chapter" data-level="12.3.1.2" data-path="external-validity.html"><a href="external-validity.html#normalized-information-distance"><i class="fa fa-check"></i><b>12.3.1.2</b> Normalized Information Distance</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3.2" data-path="external-validity.html"><a href="external-validity.html#visualizing-cluster-match"><i class="fa fa-check"></i><b>12.3.2</b> Visualizing Cluster Match</a>
+<ul>
+<li class="chapter" data-level="12.3.2.1" data-path="external-validity.html"><a href="external-validity.html#linking-cluster-maps"><i class="fa fa-check"></i><b>12.3.2.1</b> Linking Cluster Maps</a></li>
+<li class="chapter" data-level="12.3.2.2" data-path="external-validity.html"><a href="external-validity.html#cluster-match-map"><i class="fa fa-check"></i><b>12.3.2.2</b> Cluster Match Map</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="beyond-clustering.html"><a href="beyond-clustering.html"><i class="fa fa-check"></i><b>12.4</b> Beyond Clustering</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+<li> Copyright (c) 2023, Luc Anselin</li>
+<li> All Rights Reserved</li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Spatial Data Science with GeoDa</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="automatic-zoning-procedure-azp" class="section level2 hasAnchor" number="11.2">
+<h2><span class="header-section-number">11.2</span> Automatic Zoning Procedure (AZP)<a href="automatic-zoning-procedure-azp.html#automatic-zoning-procedure-azp" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The automatic zoning procedure (AZP) was initially suggested by <span class="citation">Openshaw (<a href="references.html#ref-Openshaw:77">1977</a>)</span> as a way to address
+some of the consequences of the modifiable areal unit problem (MAUP). In essence, it consists of
+a heuristic to find the best set of combinations of contiguous spatial units into <span class="math inline">\(p\)</span> regions,
+minimizing the within sum of squares as a criterion of homogeneity. The number of regions needs
+to be specified beforehand, as in all the other clustering methods considered so far.</p>
+<p>The problem is NP-hard, so that it is impossible to find an analytical solution. Also, in all but toy
+problems, a full enumeration of all possible layouts is impractical. In <span class="citation">Openshaw and Rao (<a href="references.html#ref-OpenshawRao:95">1995</a>)</span>, the original
+slow hill-climbing heuristic is augmented with a number of other approaches, such as tabu search and simulated annealing, to avoid the problem
+of becoming trapped in a local solution. None of the heuristics guarantee that a global solution will be found,
+so sensitivity analysis and some experimentation with different starting points is very important.</p>
+<p>Addressing the sensitivity of the solution to starting points is the motivation behind the
+<em>automatic regionalization with initial seed location</em> (ARiSeL) procedure, proposed by Duque and Church in
+2004.<a href="#fn52" class="footnote-ref" id="fnref52"><sup>52</sup></a></p>
+<p>It is important to keep in mind that just running AZP with the default settings is <em>not sufficient</em>. Several
+parameters need to be manipulated to get a good sense of what the best (or, a better) solution might be. This may seem a
+bit disconcerting at first, but it is intrinsic to the use of a <em>heuristic</em> that does not guarantee <em>global</em>
+optimality.</p>
+<div id="azp-heuristic" class="section level3 hasAnchor" number="11.2.1">
+<h3><span class="header-section-number">11.2.1</span> AZP Heuristic<a href="automatic-zoning-procedure-azp.html#azp-heuristic" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The original AZP heuristic is a local optimization procedure that cycles through a series of possible
+swaps between spatial units at the boundary of a given region. The process starts with an initial feasible
+solution, i.e., a grouping of <span class="math inline">\(n\)</span> spatial units into <span class="math inline">\(p\)</span> regions that consist of contiguous units.
+The initial solution can be constructed in a number of different ways, but it is critical that it
+satisfies the contiguity constraint.</p>
+<p>For example, a solution can be obtained by <em>growing</em> a set of contiguous regions from <span class="math inline">\(p\)</span>
+randomly selected <em>seed</em> units by adding neighboring locations until the contiguity constraint can no longer
+be met. In addition, the order in which neighbors are assigned to growing regions can be based on how <em>close</em> they are
+in attribute space. Alternatively, to save on having to compute the associated WSS, the order can be random.
+This process yields an initial <em>list of regions</em> and an allocation of each spatial unit to one and only one
+of the regions.</p>
+<p>To initiate the search for a local optimum, a random region from the list is selected and its set of neighboring spatial
+units considered for a swap, one at a time. More specifically, the impact on the objective function is assessed of a move of that unit from its original region to the region under consideration. Such a
+move is only allowed if it does not break the contiguity constraint in the origin region. If it improves on
+the overall objective function, i.e., the total within sum of squares, then the move is carried out.</p>
+<p>With a new unit added to the region under consideration, its neighbor structure (spatial weights) needs to be
+updated to include new neighbors from the spatial unit that was moved and that were not part of the original
+neighbor list.</p>
+<p>The evaluation is continued and moves implemented until the (updated) neighbor list is exhausted.</p>
+<p>At this point, the process moves to the next randomly picked region from the region list and repeats the evaluation
+of all the neighbors. When the region list is empty (i.e., all initial regions have been evaluated), the
+whole operation is repeated with the updated region list until the improvement in the objective function
+falls below a critical convergence criterion.</p>
+<p>The heuristic is local in that it does not try to find the globally best move. It considers
+only one neighbor of one region at a time, without checking on the potential swaps for the other neighbors or regions. As a result,
+the process can easily get trapped in a <em>local</em> optimum.</p>
+<div id="illustration" class="section level4 hasAnchor" number="11.2.1.1">
+<h4><span class="header-section-number">11.2.1.1</span> Illustration<a href="automatic-zoning-procedure-azp.html#illustration" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The logic behind the AZP heuristic is illustrated for the Arizona county example,
+with <span class="math inline">\(p\)</span> = 4.</p>
+<p>The point of departure is a <em>random</em> initial feasible solution with four clusters, for example as depicted in Figure <a href="automatic-zoning-procedure-azp.html#fig:azinitialmap">11.2</a>. The
+clusters are labeled <em>a</em> (7-9-14), <em>b</em> (1-3-10), <em>c</em> (4-8-11-12), and <em>d</em> (2-5-6-13). Since each cluster consists of contiguous
+units, it is a <em>feasible</em> solution.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azinitialmap"></span>
+<img src="pics/pics28/28_02_azp_az_start.png" alt="Arizona AZP initial feasible solution" width="40%" />
+<p class="caption">
+Figure 11.2: Arizona AZP initial feasible solution
+</p>
+</div>
+<p>The associated within sum of squares for each cluster is computed in Figure <a href="automatic-zoning-procedure-azp.html#fig:azinitialsummary">11.3</a>. The values in the column <strong>SUE</strong> are used to compute the
+cluster average (<span class="math inline">\(\bar{x}_p\)</span>), the squared values are listed in column <strong>SUE^2</strong>.
+For each cluster, the within SSD is calculated as <span class="math inline">\(\sum_i x_i^2 - n_p \bar{x}_p^2\)</span>. For example,
+for cluster <em>a</em>, this yields
+<span class="math inline">\(1.7760 - 3 \times (-0.602)^2 = 0.6905\)</span> (rounded). The <strong>Total Within SSD</strong> corresponding to this
+allocation is 6.2408, listed at the bottom of the figure.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azinitialsummary"></span>
+<img src="pics/pics28/28_03_az_azp_example_initial.png" alt="Arizona AZP initial Total Within SSD" width="35%" />
+<p class="caption">
+Figure 11.3: Arizona AZP initial Total Within SSD
+</p>
+</div>
+<p>Following the AZP logic, a list of zones is constructed as Z = [a, b, c, d]. In addition, each observation is allocated to a zone, contained in a list, as W = [b, d, b, c, d, d, a, c, a, b, c, c, d, a].</p>
+<p>Next, one of the zones is picked <em>randomly</em>, e.g., zone <em>c</em>, shown with its labels removed
+in Figure <a href="automatic-zoning-procedure-azp.html#fig:azinitialnbrs">11.4</a>. It is then removed from the list, with is updated as Z = [a, b, d]. After evaluating the neighbor list for zone <em>c</em>, this process is repeated for another element of the list, until the list is empty.</p>
+<p>Associated with
+cluster <em>c</em> is a list of its neighbors. These are identified in Figure <a href="automatic-zoning-procedure-azp.html#fig:azinitialnbrs">11.4</a> as C = [2, 3, 5, 7, 10, 13, 14].</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azinitialnbrs"></span>
+<img src="pics/pics28/28_04_azp_az_neighborlist.png" alt="Arizona AZP initial neighbor list" width="40%" />
+<p class="caption">
+Figure 11.4: Arizona AZP initial neighbor list
+</p>
+</div>
+<p>The next step consists of <em>randomly</em> selecting one of the elements of the neighbor list, e.g., 2, and to evaluate its move from its current cluster (<em>b</em>) to cluster <em>c</em>, highlighted by changing its color in the map.
+However, as shown in Figure <a href="automatic-zoning-procedure-azp.html#fig:azstep1map">11.5</a>, in this case, swapping observation 2 between <em>b</em> and <em>c</em>
+would <em>break</em> the contiguity in cluster <em>b</em> (13 would become an isolate), so this move is <em>not allowed</em>. As a result, 2 stays in cluster <em>b</em> for now.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azstep1map"></span>
+<img src="pics/pics28/28_05_azp_az_step1.png" alt="Arizona AZP step 1 neighbor selection - 2" width="40%" />
+<p class="caption">
+Figure 11.5: Arizona AZP step 1 neighbor selection - 2
+</p>
+</div>
+<p>Since the previous move was not accepted, a new move is attempted by randomly selecting another element from the remaining neighbor list C = [3, 4, 5, 7, 10, 13, 14]. For example,
+observation 14 could be considered for a move from cluster <em>a</em> to cluster <em>c</em>,
+as shown in Figure <a href="automatic-zoning-procedure-azp.html#fig:azstep2map">11.6</a>. This move does not break the contiguity between the remaining
+elements in cluster <em>a</em> (7 remains a neighbor of 9), so it is potentially allowed.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azstep2map"></span>
+<img src="pics/pics28/28_06_azp_az_step2.png" alt="Arizona AZP step 2 neighbor selection - 14" width="40%" />
+<p class="caption">
+Figure 11.6: Arizona AZP step 2 neighbor selection - 14
+</p>
+</div>
+<p>This potential swap would result in cluster <em>a</em> consisting of 2 elements and cluster <em>c</em> of 5. The corresponding updated
+sums of squared deviations are given in
+Figure <a href="automatic-zoning-procedure-azp.html#fig:azstep2summary">11.7</a>. The Total Within SSD becomes 6.2492, which is <em>not</em> an improvement over the current
+objective function (6.2408). As a consequence, this swap is <em>rejected</em> and observation 14 stays in cluster <em>a</em>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azstep2summary"></span>
+<img src="pics/pics28/28_07_az_azp_example_step2.png" alt="Arizona AZP step 2 Total Within SSD" width="35%" />
+<p class="caption">
+Figure 11.7: Arizona AZP step 2 Total Within SSD
+</p>
+</div>
+<p>At this point, observation 14 has been removed from the neighbor list, which becomes C = [3, 4, 5, 7, 10, 13]. A new neighbor is
+randomly selected, e.g., observation 3. The swap involves a move from
+cluster <em>b</em> to cluster <em>c</em>, as in
+Figure <a href="automatic-zoning-procedure-azp.html#fig:azstep3map">11.8</a>. This move does not break the contiguity of the remaining elements in cluster <em>b</em> (10 and
+1 remain neighbors), so it
+is potentially allowed.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azstep3map"></span>
+<img src="pics/pics28/28_08_azp_az_step3.png" alt="Arizona AZP step 3 neighbor selection - 3" width="40%" />
+<p class="caption">
+Figure 11.8: Arizona AZP step 3 neighbor selection - 3
+</p>
+</div>
+<p>Cluster <em>b</em> now consists of 2 elements and cluster <em>c</em> has 5. The associated SSD and <strong>Total Within SSD</strong> are listed in
+Figure <a href="automatic-zoning-procedure-azp.html#fig:azstep3summary">11.9</a>. The swap of 3 from <em>b</em> to <em>c</em> yields an improvement in the overall objective from 6.2408
+to 2.5213, so it is implemented.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azstep3summary"></span>
+<img src="pics/pics28/28_09_az_azp_example_step3.png" alt="Arizona AZP step 3 Total Within SSD" width="35%" />
+<p class="caption">
+Figure 11.9: Arizona AZP step 3 Total Within SSD
+</p>
+</div>
+<p>The next step is to re-evaluate the list of neighbors of the updated cluster <em>c</em>. It turns out that observation 9 must be included as an additional neighbor to the list. The neighbor list thus becomes C = [4, 5, 7, 10, 13, 9].</p>
+<p>The process continues by evaluating potential neighbor swaps until the list C is empty. At that point, the original list Z = [a, b, d] is reconsidered and another unit is randomly selected. Its neighbor set is identified and the procedure is repeated until list Z is empty.</p>
+<p>After the first full iteration, the whole process is repeated, starting with an updated list Z = [a, b, c, d]. This is carried out until convergence, i.e.,
+until the improvement in the overall objective becomes less than a pre-specified threshold.</p>
+</div>
+</div>
+<div id="tabu-search" class="section level3 hasAnchor" number="11.2.2">
+<h3><span class="header-section-number">11.2.2</span> Tabu Search<a href="automatic-zoning-procedure-azp.html#tabu-search" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The major idea behind methods to avoid being trapped in a local minimum amounts is to allow
+non-improving moves at one or more stages in the optimization process. This purposeful moving in the <em>wrong</em> direction
+provides a way to escape from potentially inferior local optima.</p>
+<p>A tabu search is one such method. It was originally suggested
+in the context of mixed integer programming by <span class="citation">Glover (<a href="references.html#ref-Glover:77">1977</a>)</span>, but has found wide applicability in a range of
+combinatorial problems, including AZP <span class="citation">(originally introduced in this context by <a href="references.html#ref-OpenshawRao:95">Openshaw and Rao 1995</a>)</span>.</p>
+<p>One aspect of the local search in AZP is that there may be a lot of cycling, in the sense that spatial
+units are moved from one region to another and at a later step moved back to the original region.
+In order to avoid this, a tabu search maintains a so-called tabu list that contains a number of (return)
+steps that are prohibited.</p>
+<p>With a given regional layout, all possible swaps are considered from a list of candidates
+from the adjoining neighbors. Each of these neighbors that is not in the current tabu list is considered
+for a possible swap, and the best swap is selected. If the best swap improves the overall objective
+function (the total within sum of squares), then it is implemented. This is the standard approach. In addition,
+the reverse move (moving the neighbor back to its original region) is added to the
+tabu list. In practice, this means that this entity cannot be returning to its original cluster for <span class="math inline">\(R\)</span> iterations, where <span class="math inline">\(R\)</span> is the length
+of the tabu list, or the <strong>Tabu Length</strong> parameter in <code>GeoDa</code>.</p>
+<p>If the best swap does not improve the overall objective, then the next available tabu move is considered, a so-called
+aspirational move. If the latter improves on the overall objective, it is carried out. Again, the reverse
+move is added to the tabu list. However, if the aspirational move does not improve the objective, then the original best swap is implemented anyway and again its reverse move is also added to the tabu list. In a sense, rather than making
+no move, a move is made that makes the overall objective (slightly) worse. The number of such non-improving
+moves is limited by the <strong>ConvTabu</strong> parameter.</p>
+<p>The tabu approach can dramatically improve the quality of the end result of the search. However, a critical
+parameter is the length of the tabu list, or, equivalently, the number of iterations that a tabu move
+cannot be considered. The results can be highly sensitive to the selection of this parameter, so that
+some experimentation is recommended <span class="citation">(for examples, see the detailed experiments in <a href="references.html#ref-Duqueetal:12">Duque, Anselin, and Rey 2012</a>)</span>.</p>
+<p>In all other respects, the tabu search AZP uses the same steps as outlined for the
+original AZP heuristic.</p>
+</div>
+<div id="simulated-annealing" class="section level3 hasAnchor" number="11.2.3">
+<h3><span class="header-section-number">11.2.3</span> Simulated Annealing<a href="automatic-zoning-procedure-azp.html#simulated-annealing" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Another method to avoid local minima is so-called <em>simulated annealing</em>. This approach originated in physics, and is
+also known as the
+Metropolis algorithm, commonly used in Markov Chain Monte Carlo simulation <span class="citation">(<a href="references.html#ref-Metropolisetal:53">Metropolis et al. 1953</a>)</span>. The
+idea is to introduce some randomness into the decision to accept a non-improving move, but to make
+such moves less and less likely as the heuristic proceeds.</p>
+<p>If a move (i.e., a move of a spatial unit into a new region) does not improve the objective function,
+it can still be accepted with a probability based on the so-called <em>Boltzmann equation</em>. It compares the
+(negative) exponential of the relative change in the objective function to a 0-1 uniform random number.
+The exponent is divided by a factor, called the <em>temperature</em>, which is decreased (lowered) as the
+process goes on.</p>
+<p>Formally, with <span class="math inline">\(\Delta O/O\)</span> as the relative change in the objective function and <span class="math inline">\(r\)</span> as a draw from a
+uniform 0-1 random distribution, the condition of acceptance of a non-improving move <span class="math inline">\(v\)</span> is:
+<span class="math display">\[ r &lt; e^\frac{-\Delta O/O}{T(v)},\]</span>
+where <span class="math inline">\(T(v)\)</span> is the <em>temperature</em> at annealing step <span class="math inline">\(v\)</span>.<a href="#fn53" class="footnote-ref" id="fnref53"><sup>53</sup></a>
+Typically <span class="math inline">\(v\)</span> is constrained so that only a limited number of such annealing moves are allowed per iteration. In
+addition, only a limited number of iterations are allowed (in <code>GeoDa</code>, this is controlled by the <strong>maxit</strong> parameter).</p>
+<p>The starting temperature is typically taken as <span class="math inline">\(T = 1\)</span> and gradually reduced at each annealing step <span class="math inline">\(v\)</span>
+by means of a <strong>cooling rate</strong> <span class="math inline">\(c\)</span>, such that:
+<span class="math display">\[T(v) = c.T(v-1).\]</span>
+In <code>GeoDa</code>, the default cooling rate is set to 0.85, but typically some experimentation may be
+needed. Historically, <span class="citation">Openshaw and Rao (<a href="references.html#ref-OpenshawRao:95">1995</a>)</span> suggested values for the cooling rate for AZP between 0.8 and 0.95.</p>
+<p>The effect of the cooling rate is that <span class="math inline">\(T(v)\)</span> becomes smaller, so that the value in the negative
+exponent term <span class="math inline">\(a = \frac{-\Delta O/O}{T(v)}\)</span> becomes larger. Since the relevant
+expression is <span class="math inline">\(e^{-a}\)</span>, the larger <span class="math inline">\(a\)</span> is, the smaller will be the negative exponential. The resulting value is
+compared to a uniform random number <span class="math inline">\(r\)</span>, with mean 0.5. Therefore, smaller and smaller values on the right-hand side of the Boltzmann equation will
+result in less and less likely acceptance of non-improving moves.</p>
+<p>In AZP, the simulated annealing approach is applied to the evaluation step of the neighboring
+units, i.e., whether or not the move of a spatial unit from its origin region to the region
+under consideration will improve the objective.</p>
+<p>As for the tabu search, the simulated annealing logic only pertains to selecting a neighbor swap.
+Otherwise, the heuristic is not affected.</p>
+</div>
+<div id="arisel" class="section level3 hasAnchor" number="11.2.4">
+<h3><span class="header-section-number">11.2.4</span> ARiSeL<a href="automatic-zoning-procedure-azp.html#arisel" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The ARiSeL approach, which stands for <em>automatic regionalization with initial seed location</em>, is an alternative
+way to select the initial feasible solution. In the original AZP formulation, this initial solution is
+based on a random choice of <span class="math inline">\(p\)</span> seeds, and the initial feasible regions are grown around these seeds by adding the nearest
+neighbors. It turns out that the result of AZP is highly sensitive to this starting point.</p>
+<p>Duque and Church proposed the ARiSeL alternative, based on seeds obtained from a Kmeans++ procedure (see Section <a href="the-k-means-algorithm.html#kmeansplusplus">6.2.3</a>). This yields better starting points for growing a
+whole collection of initial feasible regions. Then the best such solution is chosen as the basis
+for a tabu search or other search procedure.</p>
+</div>
+<div id="using-the-outcome-from-another-cluster-routine-as-the-initial-feasible-region" class="section level3 hasAnchor" number="11.2.5">
+<h3><span class="header-section-number">11.2.5</span> Using the Outcome from Another Cluster Routine as the Initial Feasible Region<a href="automatic-zoning-procedure-azp.html#using-the-outcome-from-another-cluster-routine-as-the-initial-feasible-region" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Rather than using a heuristic to construct a set of initial feasible regions, the outcome of another spatially constrained clustering algorithm could be used. This is particularly appropriate for hierarchical methods like SCHC, SKATER and REDCAP, where observations cannot be moved once they are assigned to a (sub-)branch of the minimum spanning tree.</p>
+<p><code>GeoDa</code> allows the allocation that resulted from other methods (like spatially constrained hierarchical methods) to be used as the starting point for AZP. This is an alternative to the random generation of a starting point.</p>
+<p>An alternative perspective on this approach is to view it as a way to improve the results of the hierarchical methods,
+where, as mentioned, observations can become trapped in a branch of the dendrogram. The flexible swapping inherent to AZP allows for the search for potential improvements at the margin. In practice, this particular application of AZP has almost always resulted in a better solution, where observations at the edge of previous regions are swapped to improve the objective function.</p>
+</div>
+<div id="implementation-12" class="section level3 hasAnchor" number="11.2.6">
+<h3><span class="header-section-number">11.2.6</span> Implementation<a href="automatic-zoning-procedure-azp.html#implementation-12" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The AZP algorithm is invoked from the drop down list associated with the cluster toolbar icon, as the first item in the
+subset highlighted in Figure <a href="topics-covered-9.html#fig:spaceparticon">11.1</a>. It can also be selected from the menu as <strong>Clusters &gt; AZP</strong>.</p>
+<p>The <strong>AZP Settings</strong> interface takes the familiar form, the same as for the other spatially constrained cluster methods. In addition to the variables and the spatial weights, the number of clusters needs to be specified,
+and the method of interest selected: <strong>AZP</strong> (the default local search), <strong>AZP-Tabu Search</strong>, or <strong>AZP-Simulated Annealing</strong>. As before, there is also an option to set a minimum bound.</p>
+<p>Two important choices are the search method and the initialization. The latter includes the option to specify a feasible initial region and side-step the customary random initialization. These options are discussed in turn. The other options are the same as before and are not further considered.</p>
+<p>The same six variables are used as in the previous chapters, and the number of regions is set to 12 in order to obtain comparable results.</p>
+</div>
+<div id="search-options" class="section level3 hasAnchor" number="11.2.7">
+<h3><span class="header-section-number">11.2.7</span> Search Options<a href="automatic-zoning-procedure-azp.html#search-options" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The search options are selected from the <strong>Method</strong> drop down list. Each has its own set of parameters.</p>
+<p>To facilitate comparison, recall that the BSS/TSS ratio for K-Means was 0.682, 0.4641 for SCHC,
+0.4325 for SKATER, and 0.4627 for REDCAP.</p>
+<div id="local-search" class="section level4 hasAnchor" number="11.2.7.1">
+<h4><span class="header-section-number">11.2.7.1</span> Local Search<a href="automatic-zoning-procedure-azp.html#local-search" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The default option is the local search, invoked as <strong>AZP</strong>. It does not have any special parameter settings. The initialization options are kept to the default.</p>
+<p>The resulting cluster map and characteristics are given in Figure <a href="automatic-zoning-procedure-azp.html#fig:azpsearch">11.10</a>. The clusters are better balanced in size than for the hierarchical solutions and there only one singleton. However, there remain six clusters with four or fewer observations. The spatial layout is somewhat different from the results obtained so far, although some broad patterns are similar.</p>
+<p>The characteristics on the right indicate the method (AZP) and the <strong>Initial value of objective function</strong> as 751.889. This is the WSS, which is reduced to 689.208 in the <strong>Final value</strong>. The usual cluster centers are reported, as well as the cluster-specific WSS. The final BSS/TSS ratio is 0.3723, the worst result so far for the spatially constrained methods.
+As mentioned, the default settings almost never provide a satisfactory result for AZP, and some experimenting is necessary.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azpsearch"></span>
+<img src="pics/pics28/28_10_azp_search.png" alt="Ceará AZP clusters for p=12, local search" width="100%" />
+<p class="caption">
+Figure 11.10: Ceará AZP clusters for p=12, local search
+</p>
+</div>
+</div>
+<div id="tabu-search-1" class="section level4 hasAnchor" number="11.2.7.2">
+<h4><span class="header-section-number">11.2.7.2</span> Tabu search<a href="automatic-zoning-procedure-azp.html#tabu-search-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p><strong>AZP-Tabu Search</strong> is the second item in the <strong>Method</strong> drop down list. The default parameters are for a <strong>Tabu Length</strong> (10) and for the <strong>ConvTabu</strong>, i.e., the number of non-improving moves allowed. Initially this is left blank, since it is computed internally, as the maximum of 10 and <span class="math inline">\(n / p\)</span>, which yields 15 in the example. With the default settings, the final value of the objective becomes 689.083 (the initial value is the same as before, since this is not affected by the search method), yielding a BSS/TSS ratio of 0.3724 (not shown).</p>
+<p>Some experimenting can improve this to 0.4004 by using a Tabu length of 50 with 25 non-improving moves. This is better than the default AZP, but still worse than the hierarchical results. The cluster map and detailed cluster characteristics are shown
+in Figure <a href="automatic-zoning-procedure-azp.html#fig:azptabu">11.11</a>. The final value of the WSS is 658.326. The spatial layout is again different, with one singletons and six clusters with five or fewer observations. However, closer examination reveal several commonalities with previous results.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azptabu"></span>
+<img src="pics/pics28/28_11_azp_tabu.png" alt="Ceará AZP clusters for p=12, tabu search" width="100%" />
+<p class="caption">
+Figure 11.11: Ceará AZP clusters for p=12, tabu search
+</p>
+</div>
+</div>
+<div id="simulated-annealing-1" class="section level4 hasAnchor" number="11.2.7.3">
+<h4><span class="header-section-number">11.2.7.3</span> Simulated annealing<a href="automatic-zoning-procedure-azp.html#simulated-annealing-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The third option in the <strong>Method</strong> drop down list is <strong>AZP-Simulated Annealing</strong>. This method is controlled by
+two important parameters: <strong>Cooling Rate</strong> and <strong>Maxit</strong>. The cooling rate is the rate at which the annealing temperature is allowed to decrease, with a default value of 0.85. <strong>Maxit</strong> sets the number of iterations allowed for each swap, with a default value of 1.</p>
+<p>For these default settings, a final BSS/RSS ratio of 0.4146 is obtained, an improvement over the previous results (the final WSS is 642.753). However, the outcome of the simulated annealing approach is very sensitive to the two parameters. Some experimentation reveals a BSS/TSS ratio of 0.4225 for a cooling rate of 0.85 with maxit=5,
+and a ratio of
+0.4368 for a cooling rate of 0.8 with maxit=5. The latter result is depicted in Figure <a href="automatic-zoning-procedure-azp.html#fig:azpanneal">11.12</a>. The
+final ratio is now in the same range as the results for the hierarchical methods.</p>
+<p>The cluster map contains a singleton (in the higher GDP area focused around the city of Fortaleza), but only two other clusters have four or fewer observations. The overall result is
+much better balanced than before. However, there are also some strange connections due to common vertices obtained with the queen contiguity criterion. For example, Cluster 1 and Cluster 5 seem to cross to the east of Crateús, and there is a strange connection between Cluster 6 and Cluster 2 south of Horizonte. This illustrates the potential sensitivity of the results to peculiarities of the spatial weights.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azpanneal"></span>
+<img src="pics/pics28/28_12_azp_anneal.png" alt="Ceará AZP clusters for p=12, simulated annealing search" width="100%" />
+<p class="caption">
+Figure 11.12: Ceará AZP clusters for p=12, simulated annealing search
+</p>
+</div>
+</div>
+</div>
+<div id="initialization-options" class="section level3 hasAnchor" number="11.2.8">
+<h3><span class="header-section-number">11.2.8</span> Initialization Options<a href="automatic-zoning-procedure-azp.html#initialization-options" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The AZP algorithm is very sensitive to the selection of the initial feasible solution. One easy approach is to assess whether a different random seed might yield a better solution. This is readily accomplished by means of the <strong>Use Specified Seed</strong> check box in the <strong>AZP Settings</strong> dialog.</p>
+<p>Alternative is to use the Kmeans++ logic from ARiSeL and to specify the initial regions explicitly.</p>
+<div id="arisel-1" class="section level4 hasAnchor" number="11.2.8.1">
+<h4><span class="header-section-number">11.2.8.1</span> ARiSeL<a href="automatic-zoning-procedure-azp.html#arisel-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The <strong>ARiSeL</strong> option is selected by means of a check box in the dialog. There is also the option to change
+the number of re-runs (the default is 10), which provides additional flexibility. With the default setting and using the
+best simulated annealing approach (cooling rate of 0.8 with maxit=5), this yields an improved solution with a BSS/TSS ratio of 0.4492. In addition, with the number of re-runs set to 50, the best AZP result so far is obtained (although still not quite as good as SCHC), depicted in
+Figure <a href="automatic-zoning-procedure-azp.html#fig:azparisel">11.13</a>. This yields a BSS/TSS ratio of 0.4627. Note also how the <strong>Initial Value</strong> of the objective function, i.e., the total WSS of the initial feasible solution has improved to 687.865 from the previous 751.889. However, in spite of this better initial solution, the final result is not always better. This very much also depends on the other choices for the algorithm parameters.</p>
+<p>The resulting layout shows several similarities with
+the cluster map in Figure <a href="automatic-zoning-procedure-azp.html#fig:azpanneal">11.12</a>, although now there are two singletons, and several more small clusters (with less than 10 observations).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azparisel"></span>
+<img src="pics/pics28/28_13_azp_arisel.png" alt="Ceará AZP clusters for p=12, simulated annealing search with ARiSeL" width="100%" />
+<p class="caption">
+Figure 11.13: Ceará AZP clusters for p=12, simulated annealing search with ARiSeL
+</p>
+</div>
+</div>
+<div id="initial-regions" class="section level4 hasAnchor" number="11.2.8.2">
+<h4><span class="header-section-number">11.2.8.2</span> Initial regions<a href="automatic-zoning-procedure-azp.html#initial-regions" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>A final way to potentially improve on the solution is to take a previous spatially constrained cluster assignment as the
+initial feasible solution. This is accomplished by checking the <strong>Initial Regions</strong> box and selecting a suitable cluster indicator variable from the drop down list.</p>
+<p>The approach is illustrated with the SCHC cluster assignment from Section <a href="spatially-constrained-hierarchical-clustering-schc.html#schcimplement">10.2.2</a> as the initial feasible solution. It is used in combination with an AZP simulated annealing algorithm with cooling rate 0.8 and maxit=5. The <strong>Initial Value</strong> of the objective function is now 588.391, i.e., the final value from the SCHC solution. This is even slightly better than the final value for the ARiSeL result (589.984), and by far the lowest initial value used up to this point.</p>
+<p>The outcome is shown in Figure <a href="automatic-zoning-procedure-azp.html#fig:azpinitial">11.14</a>. The final BSS/TSS ratio improves to 0.5036, with a final objective
+value of 545.063, the best result so far. The cluster map has three singletons and is dominated by one large region. The layout is largely the same as for the SCHC solution, with some minor adjustments at the margin.</p>
+<p>This illustrates the importance of fine tuning the various settings for the AZP algorithm, as well as the utility of leveraging several different algorithms.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:azpinitial"></span>
+<img src="pics/pics28/28_14_azp_initial.png" alt="Ceará AZP clusters for p=12, simulated annealing search with SCHC initial regions" width="100%" />
+<p class="caption">
+Figure 11.14: Ceará AZP clusters for p=12, simulated annealing search with SCHC initial regions
+</p>
+</div>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="52">
+<li id="fn52"><p>The origins of this method date back to a presentation at the North American Regional Science Conference
+in Seattle, WA, November 2004. See the description in the clusterpy documentation at <a href="http://www.rise.abetan16.webfactional.com/risem/clusterpy/clusterpy0_9_9/exogenous.html#arisel-description" class="uri">http://www.rise.abetan16.webfactional.com/risem/clusterpy/clusterpy0_9_9/exogenous.html#arisel-description</a>.<a href="automatic-zoning-procedure-azp.html#fnref52" class="footnote-back">↩︎</a></p></li>
+<li id="fn53"><p>The typical application of simulated annealing is a maximization problem, in which the negative sign in the exponential of the Boltzmann equation is absent. However, since in the current case the problem is one of <em>minimizing</em> the total within sum or squares, the exponent becomes the negative of the relative change in the objective function.<a href="automatic-zoning-procedure-azp.html#fnref53" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="topics-covered-9.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="max-p-region-problem.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/27.SpatialPartitioning.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

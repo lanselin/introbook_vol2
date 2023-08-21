@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4.4 Implementation | An Introduction to Spatial Data Science with GeoDa</title>
+  <meta name="description" content="GeoDa" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="4.4 Implementation | An Introduction to Spatial Data Science with GeoDa" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="GeoDa" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="4.4 Implementation | An Introduction to Spatial Data Science with GeoDa" />
+  
+  <meta name="twitter:description" content="GeoDa" />
+  
+
+<meta name="author" content="Luc Anselin" />
+
+
+<meta name="date" content="2023-08-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="t-sne.html"/>
+<link rel="next" href="comparing-distance-preserving-methods.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">An Introduction to Spatial Data Science</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="acknowledgments.html"><a href="acknowledgments.html"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="about-the-author.html"><a href="about-the-author.html"><i class="fa fa-check"></i>About the Author</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="overview-of-volume-2.html"><a href="overview-of-volume-2.html"><i class="fa fa-check"></i><b>1.1</b> Overview of Volume 2</a></li>
+<li class="chapter" data-level="1.2" data-path="sample-data-sets.html"><a href="sample-data-sets.html"><i class="fa fa-check"></i><b>1.2</b> Sample Data Sets</a></li>
+</ul></li>
+<li class="part"><span><b>I Dimension Reduction</b></span></li>
+<li class="chapter" data-level="2" data-path="CHPCA.html"><a href="CHPCA.html"><i class="fa fa-check"></i><b>2</b> Principal Component Analysis (PCA)</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="topics-covered.html"><a href="topics-covered.html"><i class="fa fa-check"></i><b>2.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html"><i class="fa fa-check"></i><b>2.2</b> Matrix Algebra Review</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#eigenvalues-and-eigenvectors"><i class="fa fa-check"></i><b>2.2.1</b> Eigenvalues and eigenvectors</a></li>
+<li class="chapter" data-level="2.2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#matrix-decompositions"><i class="fa fa-check"></i><b>2.2.2</b> Matrix decompositions</a>
+<ul>
+<li class="chapter" data-level="2.2.2.1" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#spectraldecomposition"><i class="fa fa-check"></i><b>2.2.2.1</b> Spectral decomposition</a></li>
+<li class="chapter" data-level="2.2.2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#svd"><i class="fa fa-check"></i><b>2.2.2.2</b> Singular value decomposition (SVD)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="principal-components.html"><a href="principal-components.html"><i class="fa fa-check"></i><b>2.3</b> Principal Components</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="principal-components.html"><a href="principal-components.html#implementation"><i class="fa fa-check"></i><b>2.3.1</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="2.3.1.1" data-path="principal-components.html"><a href="principal-components.html#saving-the-principal-components"><i class="fa fa-check"></i><b>2.3.1.1</b> Saving the principal components</a></li>
+<li class="chapter" data-level="2.3.1.2" data-path="principal-components.html"><a href="principal-components.html#saving-the-result-summary"><i class="fa fa-check"></i><b>2.3.1.2</b> Saving the result summary</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3.2" data-path="principal-components.html"><a href="principal-components.html#pcainterpretation"><i class="fa fa-check"></i><b>2.3.2</b> Interpretation</a>
+<ul>
+<li class="chapter" data-level="2.3.2.1" data-path="principal-components.html"><a href="principal-components.html#pcaexplainedvar"><i class="fa fa-check"></i><b>2.3.2.1</b> Explained variance</a></li>
+<li class="chapter" data-level="2.3.2.2" data-path="principal-components.html"><a href="principal-components.html#variable-loadings"><i class="fa fa-check"></i><b>2.3.2.2</b> Variable loadings</a></li>
+<li class="chapter" data-level="2.3.2.3" data-path="principal-components.html"><a href="principal-components.html#loadingsandpca"><i class="fa fa-check"></i><b>2.3.2.3</b> Variable loadings and principal components</a></li>
+<li class="chapter" data-level="2.3.2.4" data-path="principal-components.html"><a href="principal-components.html#substantive-interpretation---squared-correlation"><i class="fa fa-check"></i><b>2.3.2.4</b> Substantive interpretation - squared correlation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="vizpca.html"><a href="vizpca.html"><i class="fa fa-check"></i><b>2.4</b> Visualizing principal components</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="vizpca.html"><a href="vizpca.html#scatter-plot"><i class="fa fa-check"></i><b>2.4.1</b> Scatter plot</a></li>
+<li class="chapter" data-level="2.4.2" data-path="vizpca.html"><a href="vizpca.html#multivariate-decomposition"><i class="fa fa-check"></i><b>2.4.2</b> Multivariate decomposition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html"><i class="fa fa-check"></i><b>2.5</b> Spatializing Principal Components</a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#principal-component-map"><i class="fa fa-check"></i><b>2.5.1</b> Principal component map</a></li>
+<li class="chapter" data-level="2.5.2" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#univariate-cluster-map"><i class="fa fa-check"></i><b>2.5.2</b> Univariate cluster map</a></li>
+<li class="chapter" data-level="2.5.3" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#principal-components-as-multivariate-cluster-maps"><i class="fa fa-check"></i><b>2.5.3</b> Principal components as multivariate cluster maps</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="CHMDS.html"><a href="CHMDS.html"><i class="fa fa-check"></i><b>3</b> Multidimensional Scaling (MDS)</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="topics-covered-1.html"><a href="topics-covered-1.html"><i class="fa fa-check"></i><b>3.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="3.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html"><i class="fa fa-check"></i><b>3.2</b> Classic Metric Scaling</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#mathematical-details"><i class="fa fa-check"></i><b>3.2.1</b> Mathematical Details</a>
+<ul>
+<li class="chapter" data-level="3.2.1.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#classic-metric-mds-and-principal-components"><i class="fa fa-check"></i><b>3.2.1.1</b> Classic metric MDS and principal components</a></li>
+<li class="chapter" data-level="3.2.1.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#poweriteration"><i class="fa fa-check"></i><b>3.2.1.2</b> Power iteration method</a></li>
+<li class="chapter" data-level="3.2.1.3" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#Gramanddissimilarity"><i class="fa fa-check"></i><b>3.2.1.3</b> Dissimilarity matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#MDSimplementation"><i class="fa fa-check"></i><b>3.2.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="3.2.2.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#saving-the-mds-coordinates"><i class="fa fa-check"></i><b>3.2.2.1</b> Saving the MDS coordinates</a></li>
+<li class="chapter" data-level="3.2.2.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#mds-and-pca"><i class="fa fa-check"></i><b>3.2.2.2</b> MDS and PCA</a></li>
+<li class="chapter" data-level="3.2.2.3" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#power-approximation"><i class="fa fa-check"></i><b>3.2.2.3</b> Power approximation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="smacof.html"><a href="smacof.html"><i class="fa fa-check"></i><b>3.3</b> SMACOF</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="smacof.html"><a href="smacof.html#mathematical-details-1"><i class="fa fa-check"></i><b>3.3.1</b> Mathematical Details</a></li>
+<li class="chapter" data-level="3.3.2" data-path="smacof.html"><a href="smacof.html#implementation-1"><i class="fa fa-check"></i><b>3.3.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="3.3.2.1" data-path="smacof.html"><a href="smacof.html#manhattan-block-distance"><i class="fa fa-check"></i><b>3.3.2.1</b> Manhattan block distance</a></li>
+<li class="chapter" data-level="3.3.2.2" data-path="smacof.html"><a href="smacof.html#smacofvsclassic"><i class="fa fa-check"></i><b>3.3.2.2</b> SMACOF vs classic metric MDS</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="vizmds.html"><a href="vizmds.html"><i class="fa fa-check"></i><b>3.4</b> Visualizing MDS</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="vizmds.html"><a href="vizmds.html#mds-and-parallel-coordinate-plot"><i class="fa fa-check"></i><b>3.4.1</b> MDS and Parallel Coordinate Plot</a></li>
+<li class="chapter" data-level="3.4.2" data-path="vizmds.html"><a href="vizmds.html#MDScategories"><i class="fa fa-check"></i><b>3.4.2</b> MDS Scatter Plot with Categories</a></li>
+<li class="chapter" data-level="3.4.3" data-path="vizmds.html"><a href="vizmds.html#d-mds"><i class="fa fa-check"></i><b>3.4.3</b> 3-D MDS</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="spatializemds.html"><a href="spatializemds.html"><i class="fa fa-check"></i><b>3.5</b> Spatializing MDS</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="spatializemds.html"><a href="spatializemds.html#mds-and-map"><i class="fa fa-check"></i><b>3.5.1</b> MDS and Map</a></li>
+<li class="chapter" data-level="3.5.2" data-path="spatializemds.html"><a href="spatializemds.html#mds-spatial-weights"><i class="fa fa-check"></i><b>3.5.2</b> MDS Spatial Weights</a>
+<ul>
+<li class="chapter" data-level="3.5.2.1" data-path="spatializemds.html"><a href="spatializemds.html#attribute-and-geographical-neighbors"><i class="fa fa-check"></i><b>3.5.2.1</b> Attribute and geographical neighbors</a></li>
+<li class="chapter" data-level="3.5.2.2" data-path="spatializemds.html"><a href="spatializemds.html#MDSneighborsimilarity"><i class="fa fa-check"></i><b>3.5.2.2</b> Common coverage percentage</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5.3" data-path="spatializemds.html"><a href="spatializemds.html#mdsneighbormatch"><i class="fa fa-check"></i><b>3.5.3</b> MDS Neighbor Match Test</a></li>
+<li class="chapter" data-level="3.5.4" data-path="spatializemds.html"><a href="spatializemds.html#hdbscan-and-mds"><i class="fa fa-check"></i><b>3.5.4</b> HDBSCAN and MDS</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="CHSNE.html"><a href="CHSNE.html"><i class="fa fa-check"></i><b>4</b> Stochastic Neighbor Embedding (SNE)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="topics-covered-2.html"><a href="topics-covered-2.html"><i class="fa fa-check"></i><b>4.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="4.2" data-path="basics-of-information-theory.html"><a href="basics-of-information-theory.html"><i class="fa fa-check"></i><b>4.2</b> Basics of Information Theory</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="basics-of-information-theory.html"><a href="basics-of-information-theory.html#stochastic-neighbors"><i class="fa fa-check"></i><b>4.2.1</b> Stochastic Neighbors</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="t-sne.html"><a href="t-sne.html"><i class="fa fa-check"></i><b>4.3</b> t-SNE</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="t-sne.html"><a href="t-sne.html#cost-function-and-optimization"><i class="fa fa-check"></i><b>4.3.1</b> Cost Function and Optimization</a></li>
+<li class="chapter" data-level="4.3.2" data-path="t-sne.html"><a href="t-sne.html#large-data-applications-barnes-hut"><i class="fa fa-check"></i><b>4.3.2</b> Large Data Applications (Barnes-Hut)</a>
+<ul>
+<li class="chapter" data-level="4.3.2.1" data-path="t-sne.html"><a href="t-sne.html#simplification-of-p"><i class="fa fa-check"></i><b>4.3.2.1</b> Simplification of <span class="math inline">\(P\)</span></a></li>
+<li class="chapter" data-level="4.3.2.2" data-path="t-sne.html"><a href="t-sne.html#BarnesHutQ"><i class="fa fa-check"></i><b>4.3.2.2</b> Simplification of <span class="math inline">\(Q\)</span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="implementation-2.html"><a href="implementation-2.html"><i class="fa fa-check"></i><b>4.4</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="4.4.0.1" data-path="implementation-2.html"><a href="implementation-2.html#inspecting-the-iterations"><i class="fa fa-check"></i><b>4.4.0.1</b> Inspecting the iterations</a></li>
+<li class="chapter" data-level="4.4.1" data-path="implementation-2.html"><a href="implementation-2.html#tsneanimation"><i class="fa fa-check"></i><b>4.4.1</b> Animation</a></li>
+<li class="chapter" data-level="4.4.2" data-path="implementation-2.html"><a href="implementation-2.html#tuning-the-optimization"><i class="fa fa-check"></i><b>4.4.2</b> Tuning the Optimization</a>
+<ul>
+<li class="chapter" data-level="4.4.2.1" data-path="implementation-2.html"><a href="implementation-2.html#theta"><i class="fa fa-check"></i><b>4.4.2.1</b> Theta</a></li>
+<li class="chapter" data-level="4.4.2.2" data-path="implementation-2.html"><a href="implementation-2.html#perplexity"><i class="fa fa-check"></i><b>4.4.2.2</b> Perplexity</a></li>
+<li class="chapter" data-level="4.4.2.3" data-path="implementation-2.html"><a href="implementation-2.html#iteration-momentum-switch"><i class="fa fa-check"></i><b>4.4.2.3</b> Iteration momentum switch</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4.3" data-path="implementation-2.html"><a href="implementation-2.html#interpretation-and-spatialization"><i class="fa fa-check"></i><b>4.4.3</b> Interpretation and Spatialization</a>
+<ul>
+<li class="chapter" data-level="4.4.3.1" data-path="implementation-2.html"><a href="implementation-2.html#nearest-neighbor-match-test"><i class="fa fa-check"></i><b>4.4.3.1</b> Nearest neighbor match test</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html"><i class="fa fa-check"></i><b>4.5</b> Comparing Distance Preserving Methods</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html#comparing-t-sne-options"><i class="fa fa-check"></i><b>4.5.1</b> Comparing t-SNE Options</a></li>
+<li class="chapter" data-level="4.5.2" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html#local-fit-with-common-coverage-percentage"><i class="fa fa-check"></i><b>4.5.2</b> Local Fit with Common Coverage Percentage</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II Classic Clustering</b></span></li>
+<li class="chapter" data-level="5" data-path="CHhierarchicalclustering.html"><a href="CHhierarchicalclustering.html"><i class="fa fa-check"></i><b>5</b> Hierarchical Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="topics-covered-3.html"><a href="topics-covered-3.html"><i class="fa fa-check"></i><b>5.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="5.2" data-path="dissimilarity.html"><a href="dissimilarity.html"><i class="fa fa-check"></i><b>5.2</b> Dissimilarity</a></li>
+<li class="chapter" data-level="5.3" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html"><i class="fa fa-check"></i><b>5.3</b> Agglomerative Clustering</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#linkage-and-updating-formula"><i class="fa fa-check"></i><b>5.3.1</b> Linkage and Updating Formula</a>
+<ul>
+<li class="chapter" data-level="5.3.1.1" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#single-linkage"><i class="fa fa-check"></i><b>5.3.1.1</b> Single linkage</a></li>
+<li class="chapter" data-level="5.3.1.2" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#complete-linkage"><i class="fa fa-check"></i><b>5.3.1.2</b> Complete linkage</a></li>
+<li class="chapter" data-level="5.3.1.3" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#average-linkage"><i class="fa fa-check"></i><b>5.3.1.3</b> Average linkage</a></li>
+<li class="chapter" data-level="5.3.1.4" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#wards-method"><i class="fa fa-check"></i><b>5.3.1.4</b> Ward’s method</a></li>
+<li class="chapter" data-level="5.3.1.5" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#illustration---single-linkage"><i class="fa fa-check"></i><b>5.3.1.5</b> Illustration - single linkage</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3.2" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#dendrogram"><i class="fa fa-check"></i><b>5.3.2</b> Dendrogram</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="implementation-3.html"><a href="implementation-3.html"><i class="fa fa-check"></i><b>5.4</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="implementation-3.html"><a href="implementation-3.html#hierarchicalvariables"><i class="fa fa-check"></i><b>5.4.1</b> Variable Settings Dialog</a></li>
+<li class="chapter" data-level="5.4.2" data-path="implementation-3.html"><a href="implementation-3.html#wards-method-1"><i class="fa fa-check"></i><b>5.4.2</b> Ward’s method</a></li>
+<li class="chapter" data-level="5.4.3" data-path="implementation-3.html"><a href="implementation-3.html#single-linkage-1"><i class="fa fa-check"></i><b>5.4.3</b> Single linkage</a></li>
+<li class="chapter" data-level="5.4.4" data-path="implementation-3.html"><a href="implementation-3.html#complete-linkage-1"><i class="fa fa-check"></i><b>5.4.4</b> Complete linkage</a></li>
+<li class="chapter" data-level="5.4.5" data-path="implementation-3.html"><a href="implementation-3.html#average-linkage-1"><i class="fa fa-check"></i><b>5.4.5</b> Average linkage</a></li>
+<li class="chapter" data-level="5.4.6" data-path="implementation-3.html"><a href="implementation-3.html#sensitivity-analysis"><i class="fa fa-check"></i><b>5.4.6</b> Sensitivity Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="CHPartioningCluster.html"><a href="CHPartioningCluster.html"><i class="fa fa-check"></i><b>6</b> Partioning Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="topics-covered-4.html"><a href="topics-covered-4.html"><i class="fa fa-check"></i><b>6.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="6.2" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html"><i class="fa fa-check"></i><b>6.2</b> The K Means Algorithm</a>
+<ul>
+<li class="chapter" data-level="" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#mathematical-details-2"><i class="fa fa-check"></i>Mathematical details</a></li>
+<li class="chapter" data-level="6.2.1" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#iterativerelocation"><i class="fa fa-check"></i><b>6.2.1</b> Iterative Relocation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#the-choice-of-k"><i class="fa fa-check"></i><b>6.2.2</b> The Choice of K</a></li>
+<li class="chapter" data-level="6.2.3" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#kmeansplusplus"><i class="fa fa-check"></i><b>6.2.3</b> K-means++</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="implementation-4.html"><a href="implementation-4.html"><i class="fa fa-check"></i><b>6.3</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="implementation-4.html"><a href="implementation-4.html#digressionpca"><i class="fa fa-check"></i><b>6.3.1</b> Digression: Clustering with Dimension Reduction</a></li>
+<li class="chapter" data-level="6.3.2" data-path="implementation-4.html"><a href="implementation-4.html#cluster-parameters"><i class="fa fa-check"></i><b>6.3.2</b> Cluster Parameters</a></li>
+<li class="chapter" data-level="6.3.3" data-path="implementation-4.html"><a href="implementation-4.html#cluster-results"><i class="fa fa-check"></i><b>6.3.3</b> Cluster Results</a>
+<ul>
+<li class="chapter" data-level="6.3.3.1" data-path="implementation-4.html"><a href="implementation-4.html#adjustclusterlabels"><i class="fa fa-check"></i><b>6.3.3.1</b> Adjusting cluster labels</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3.4" data-path="implementation-4.html"><a href="implementation-4.html#kmeansoptions"><i class="fa fa-check"></i><b>6.3.4</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="6.3.4.1" data-path="implementation-4.html"><a href="implementation-4.html#initialization"><i class="fa fa-check"></i><b>6.3.4.1</b> Initialization</a></li>
+<li class="chapter" data-level="6.3.4.2" data-path="implementation-4.html"><a href="implementation-4.html#kmeanselbowplot"><i class="fa fa-check"></i><b>6.3.4.2</b> Selecting k – Elbow plot</a></li>
+<li class="chapter" data-level="6.3.4.3" data-path="implementation-4.html"><a href="implementation-4.html#standardization"><i class="fa fa-check"></i><b>6.3.4.3</b> Standardization</a></li>
+<li class="chapter" data-level="6.3.4.4" data-path="implementation-4.html"><a href="implementation-4.html#kmeansminbound"><i class="fa fa-check"></i><b>6.3.4.4</b> Minimum bound</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html"><i class="fa fa-check"></i><b>6.4</b> Cluster Categories as Variables</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html#conditional-box-plot"><i class="fa fa-check"></i><b>6.4.1</b> Conditional Box Plot</a></li>
+<li class="chapter" data-level="6.4.2" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html#clusteraggregation"><i class="fa fa-check"></i><b>6.4.2</b> Aggregation by Cluster</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="CHAdvancedClustering.html"><a href="CHAdvancedClustering.html"><i class="fa fa-check"></i><b>7</b> Advanced Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="topics-covered-5.html"><a href="topics-covered-5.html"><i class="fa fa-check"></i><b>7.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="7.2" data-path="k-medians.html"><a href="k-medians.html"><i class="fa fa-check"></i><b>7.2</b> K-Medians</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="k-medians.html"><a href="k-medians.html#implementation-5"><i class="fa fa-check"></i><b>7.2.1</b> Implementation</a></li>
+<li class="chapter" data-level="7.2.2" data-path="k-medians.html"><a href="k-medians.html#options-and-sensitivity-analysis"><i class="fa fa-check"></i><b>7.2.2</b> Options and Sensitivity Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="kmedoids.html"><a href="kmedoids.html"><i class="fa fa-check"></i><b>7.3</b> K-Medoids</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="kmedoids.html"><a href="kmedoids.html#the-pam-algorithm-for-k-medoids"><i class="fa fa-check"></i><b>7.3.1</b> The PAM Algorithm for K-Medoids</a>
+<ul>
+<li class="chapter" data-level="7.3.1.1" data-path="kmedoids.html"><a href="kmedoids.html#build"><i class="fa fa-check"></i><b>7.3.1.1</b> Build</a></li>
+<li class="chapter" data-level="7.3.1.2" data-path="kmedoids.html"><a href="kmedoids.html#swap"><i class="fa fa-check"></i><b>7.3.1.2</b> Swap</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.2" data-path="kmedoids.html"><a href="kmedoids.html#improving-on-the-pam-algorithm"><i class="fa fa-check"></i><b>7.3.2</b> Improving on the PAM Algorithm</a>
+<ul>
+<li class="chapter" data-level="7.3.2.1" data-path="kmedoids.html"><a href="kmedoids.html#clara"><i class="fa fa-check"></i><b>7.3.2.1</b> CLARA</a></li>
+<li class="chapter" data-level="7.3.2.2" data-path="kmedoids.html"><a href="kmedoids.html#clarans"><i class="fa fa-check"></i><b>7.3.2.2</b> CLARANS</a></li>
+<li class="chapter" data-level="7.3.2.3" data-path="kmedoids.html"><a href="kmedoids.html#lab"><i class="fa fa-check"></i><b>7.3.2.3</b> LAB</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.3" data-path="kmedoids.html"><a href="kmedoids.html#kmedoidsimplementation"><i class="fa fa-check"></i><b>7.3.3</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="7.3.3.1" data-path="kmedoids.html"><a href="kmedoids.html#cluster-results-1"><i class="fa fa-check"></i><b>7.3.3.1</b> Cluster results</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.4" data-path="kmedoids.html"><a href="kmedoids.html#options-and-sensitivity-analysis-1"><i class="fa fa-check"></i><b>7.3.4</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="7.3.4.1" data-path="kmedoids.html"><a href="kmedoids.html#clara-parameters"><i class="fa fa-check"></i><b>7.3.4.1</b> CLARA parameters</a></li>
+<li class="chapter" data-level="7.3.4.2" data-path="kmedoids.html"><a href="kmedoids.html#clarans-parameters"><i class="fa fa-check"></i><b>7.3.4.2</b> CLARANS parameters</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="CHSpectralClustering.html"><a href="CHSpectralClustering.html"><i class="fa fa-check"></i><b>8</b> Spectral Clustering</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="topics-covered-6.html"><a href="topics-covered-6.html"><i class="fa fa-check"></i><b>8.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="8.2" data-path="spectral-clustering-logic.html"><a href="spectral-clustering-logic.html"><i class="fa fa-check"></i><b>8.2</b> Spectral Clustering Logic</a></li>
+<li class="chapter" data-level="8.3" data-path="clustering-as-a-graph-partitioning-problem.html"><a href="clustering-as-a-graph-partitioning-problem.html"><i class="fa fa-check"></i><b>8.3</b> Clustering as a Graph Partitioning Problem</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="clustering-as-a-graph-partitioning-problem.html"><a href="clustering-as-a-graph-partitioning-problem.html#graph-laplacian"><i class="fa fa-check"></i><b>8.3.1</b> Graph Laplacian</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html"><i class="fa fa-check"></i><b>8.4</b> The Spectral Clustering Algorithm</a>
+<ul>
+<li class="chapter" data-level="8.4.1" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#spectraladjacency"><i class="fa fa-check"></i><b>8.4.1</b> Adjacency matrix</a></li>
+<li class="chapter" data-level="8.4.2" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#clustering-on-the-eigenvectors-of-the-graph-laplacian"><i class="fa fa-check"></i><b>8.4.2</b> Clustering on the Eigenvectors of the Graph Laplacian</a></li>
+<li class="chapter" data-level="8.4.3" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#spectralparameters"><i class="fa fa-check"></i><b>8.4.3</b> Spectral Clustering Parameters</a></li>
+</ul></li>
+<li class="chapter" data-level="8.5" data-path="implementation-6.html"><a href="implementation-6.html"><i class="fa fa-check"></i><b>8.5</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="8.5.1" data-path="implementation-6.html"><a href="implementation-6.html#cluster-results-2"><i class="fa fa-check"></i><b>8.5.1</b> Cluster results</a></li>
+<li class="chapter" data-level="8.5.2" data-path="implementation-6.html"><a href="implementation-6.html#options-and-sensitivity-analysis-2"><i class="fa fa-check"></i><b>8.5.2</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="8.5.2.1" data-path="implementation-6.html"><a href="implementation-6.html#k-nearest-neighbor-affinity-matrix"><i class="fa fa-check"></i><b>8.5.2.1</b> K-nearest neighbor affinity matrix</a></li>
+<li class="chapter" data-level="8.5.2.2" data-path="implementation-6.html"><a href="implementation-6.html#gaussian-kernel-affinity-matrix"><i class="fa fa-check"></i><b>8.5.2.2</b> Gaussian kernel affinity matrix</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>III Spatial Clustering</b></span></li>
+<li class="chapter" data-level="9" data-path="CHspatialclassicclustering.html"><a href="CHspatialclassicclustering.html"><i class="fa fa-check"></i><b>9</b> Spatializing Classic Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="topics-covered-7.html"><a href="topics-covered-7.html"><i class="fa fa-check"></i><b>9.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="9.2" data-path="clustering-on-geographic-coordinates.html"><a href="clustering-on-geographic-coordinates.html"><i class="fa fa-check"></i><b>9.2</b> Clustering on Geographic Coordinates</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="clustering-on-geographic-coordinates.html"><a href="clustering-on-geographic-coordinates.html#implementation-7"><i class="fa fa-check"></i><b>9.2.1</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="including-geographical-coordinates-in-the-feature-set.html"><a href="including-geographical-coordinates-in-the-feature-set.html"><i class="fa fa-check"></i><b>9.3</b> Including Geographical Coordinates in the Feature Set</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="including-geographical-coordinates-in-the-feature-set.html"><a href="including-geographical-coordinates-in-the-feature-set.html#implementation-8"><i class="fa fa-check"></i><b>9.3.1</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html"><i class="fa fa-check"></i><b>9.4</b> Weighted Optimization of Geographical and Attribute Similarity</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#optimization"><i class="fa fa-check"></i><b>9.4.1</b> Optimization</a>
+<ul>
+<li class="chapter" data-level="9.4.1.1" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#connectivity-check"><i class="fa fa-check"></i><b>9.4.1.1</b> Connectivity check</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4.2" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#implementation-9"><i class="fa fa-check"></i><b>9.4.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="constructingspatialcontiguous.html"><a href="constructingspatialcontiguous.html"><i class="fa fa-check"></i><b>9.5</b> Constructing a Spatially Contiguous Solution</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="constructingspatialcontiguous.html"><a href="constructingspatialcontiguous.html#implementation-10"><i class="fa fa-check"></i><b>9.5.1</b> Implementation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="CHspatialhierarchical.html"><a href="CHspatialhierarchical.html"><i class="fa fa-check"></i><b>10</b> Spatially Constrained Clustering - Hierarchical Methods</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="topics-covered-8.html"><a href="topics-covered-8.html"><i class="fa fa-check"></i><b>10.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="10.2" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html"><i class="fa fa-check"></i><b>10.2</b> Spatially Constrained Hierarchical Clustering (SCHC)</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schcalgillustration"><i class="fa fa-check"></i><b>10.2.1</b> The Algorithm</a>
+<ul>
+<li class="chapter" data-level="10.2.1.1" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schccompletelinkage"><i class="fa fa-check"></i><b>10.2.1.1</b> SCHC Complete Linkage</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2.2" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schcimplement"><i class="fa fa-check"></i><b>10.2.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="skater.html"><a href="skater.html"><i class="fa fa-check"></i><b>10.3</b> SKATER</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="skater.html"><a href="skater.html#skaterpruning"><i class="fa fa-check"></i><b>10.3.1</b> Pruning the Minimum Spanning Tree</a></li>
+<li class="chapter" data-level="10.3.2" data-path="skater.html"><a href="skater.html#implementation-11"><i class="fa fa-check"></i><b>10.3.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="10.3.2.1" data-path="skater.html"><a href="skater.html#saveMST"><i class="fa fa-check"></i><b>10.3.2.1</b> Saving the Minimum Spanning Tree</a></li>
+<li class="chapter" data-level="10.3.2.2" data-path="skater.html"><a href="skater.html#setskaterminsize"><i class="fa fa-check"></i><b>10.3.2.2</b> Setting a minimum cluster size</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="redcap.html"><a href="redcap.html"><i class="fa fa-check"></i><b>10.4</b> REDCAP</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="redcap.html"><a href="redcap.html#illustration---fullorder-completelinkage"><i class="fa fa-check"></i><b>10.4.1</b> Illustration - FullOrder-CompleteLinkage</a></li>
+<li class="chapter" data-level="10.4.2" data-path="redcap.html"><a href="redcap.html#redcapimplementation"><i class="fa fa-check"></i><b>10.4.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="assessment.html"><a href="assessment.html"><i class="fa fa-check"></i><b>10.5</b> Assessment</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="CHspatialpartition.html"><a href="CHspatialpartition.html"><i class="fa fa-check"></i><b>11</b> Spatially Constrained Clustering - Partitioning Methods</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="topics-covered-9.html"><a href="topics-covered-9.html"><i class="fa fa-check"></i><b>11.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="11.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html"><i class="fa fa-check"></i><b>11.2</b> Automatic Zoning Procedure (AZP)</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#azp-heuristic"><i class="fa fa-check"></i><b>11.2.1</b> AZP Heuristic</a>
+<ul>
+<li class="chapter" data-level="11.2.1.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#illustration"><i class="fa fa-check"></i><b>11.2.1.1</b> Illustration</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#tabu-search"><i class="fa fa-check"></i><b>11.2.2</b> Tabu Search</a></li>
+<li class="chapter" data-level="11.2.3" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#simulated-annealing"><i class="fa fa-check"></i><b>11.2.3</b> Simulated Annealing</a></li>
+<li class="chapter" data-level="11.2.4" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#arisel"><i class="fa fa-check"></i><b>11.2.4</b> ARiSeL</a></li>
+<li class="chapter" data-level="11.2.5" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#using-the-outcome-from-another-cluster-routine-as-the-initial-feasible-region"><i class="fa fa-check"></i><b>11.2.5</b> Using the Outcome from Another Cluster Routine as the Initial Feasible Region</a></li>
+<li class="chapter" data-level="11.2.6" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#implementation-12"><i class="fa fa-check"></i><b>11.2.6</b> Implementation</a></li>
+<li class="chapter" data-level="11.2.7" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#search-options"><i class="fa fa-check"></i><b>11.2.7</b> Search Options</a>
+<ul>
+<li class="chapter" data-level="11.2.7.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#local-search"><i class="fa fa-check"></i><b>11.2.7.1</b> Local Search</a></li>
+<li class="chapter" data-level="11.2.7.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#tabu-search-1"><i class="fa fa-check"></i><b>11.2.7.2</b> Tabu search</a></li>
+<li class="chapter" data-level="11.2.7.3" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#simulated-annealing-1"><i class="fa fa-check"></i><b>11.2.7.3</b> Simulated annealing</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2.8" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#initialization-options"><i class="fa fa-check"></i><b>11.2.8</b> Initialization Options</a>
+<ul>
+<li class="chapter" data-level="11.2.8.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#arisel-1"><i class="fa fa-check"></i><b>11.2.8.1</b> ARiSeL</a></li>
+<li class="chapter" data-level="11.2.8.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#initial-regions"><i class="fa fa-check"></i><b>11.2.8.2</b> Initial regions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html"><i class="fa fa-check"></i><b>11.3</b> Max-P Region Problem</a>
+<ul>
+<li class="chapter" data-level="11.3.1" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#max-p-heuristic"><i class="fa fa-check"></i><b>11.3.1</b> Max-p Heuristic</a>
+<ul>
+<li class="chapter" data-level="11.3.1.1" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#illustration-1"><i class="fa fa-check"></i><b>11.3.1.1</b> Illustration</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3.2" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#implementation-13"><i class="fa fa-check"></i><b>11.3.2</b> Implementation</a></li>
+<li class="chapter" data-level="11.3.3" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#sensitivity-analysis-1"><i class="fa fa-check"></i><b>11.3.3</b> Sensitivity Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>IV Assessment</b></span></li>
+<li class="chapter" data-level="12" data-path="CHclustervalidation.html"><a href="CHclustervalidation.html"><i class="fa fa-check"></i><b>12</b> Cluster Validation</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="topics-covered-10.html"><a href="topics-covered-10.html"><i class="fa fa-check"></i><b>12.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="12.2" data-path="internal-validity.html"><a href="internal-validity.html"><i class="fa fa-check"></i><b>12.2</b> Internal Validity</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="internal-validity.html"><a href="internal-validity.html#traditional-measures-of-fit"><i class="fa fa-check"></i><b>12.2.1</b> Traditional Measures of Fit</a></li>
+<li class="chapter" data-level="12.2.2" data-path="internal-validity.html"><a href="internal-validity.html#clusterbalance"><i class="fa fa-check"></i><b>12.2.2</b> Balance</a></li>
+<li class="chapter" data-level="12.2.3" data-path="internal-validity.html"><a href="internal-validity.html#join-count-ratio"><i class="fa fa-check"></i><b>12.2.3</b> Join Count Ratio</a></li>
+<li class="chapter" data-level="12.2.4" data-path="internal-validity.html"><a href="internal-validity.html#compactness"><i class="fa fa-check"></i><b>12.2.4</b> Compactness</a></li>
+<li class="chapter" data-level="12.2.5" data-path="internal-validity.html"><a href="internal-validity.html#connectedness"><i class="fa fa-check"></i><b>12.2.5</b> Connectedness</a></li>
+<li class="chapter" data-level="12.2.6" data-path="internal-validity.html"><a href="internal-validity.html#implementation-14"><i class="fa fa-check"></i><b>12.2.6</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="external-validity.html"><a href="external-validity.html"><i class="fa fa-check"></i><b>12.3</b> External Validity</a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="external-validity.html"><a href="external-validity.html#classic-measures"><i class="fa fa-check"></i><b>12.3.1</b> Classic Measures</a>
+<ul>
+<li class="chapter" data-level="12.3.1.1" data-path="external-validity.html"><a href="external-validity.html#adjusted-rand-index"><i class="fa fa-check"></i><b>12.3.1.1</b> Adjusted Rand Index</a></li>
+<li class="chapter" data-level="12.3.1.2" data-path="external-validity.html"><a href="external-validity.html#normalized-information-distance"><i class="fa fa-check"></i><b>12.3.1.2</b> Normalized Information Distance</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3.2" data-path="external-validity.html"><a href="external-validity.html#visualizing-cluster-match"><i class="fa fa-check"></i><b>12.3.2</b> Visualizing Cluster Match</a>
+<ul>
+<li class="chapter" data-level="12.3.2.1" data-path="external-validity.html"><a href="external-validity.html#linking-cluster-maps"><i class="fa fa-check"></i><b>12.3.2.1</b> Linking Cluster Maps</a></li>
+<li class="chapter" data-level="12.3.2.2" data-path="external-validity.html"><a href="external-validity.html#cluster-match-map"><i class="fa fa-check"></i><b>12.3.2.2</b> Cluster Match Map</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="beyond-clustering.html"><a href="beyond-clustering.html"><i class="fa fa-check"></i><b>12.4</b> Beyond Clustering</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+<li> Copyright (c) 2023, Luc Anselin</li>
+<li> All Rights Reserved</li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Spatial Data Science with GeoDa</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="implementation-2" class="section level2 hasAnchor" number="4.4">
+<h2><span class="header-section-number">4.4</span> Implementation<a href="implementation-2.html#implementation-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The t-SNE functionality is invoked from the drop down list created by the toolbar <strong>Clusters</strong> icon (Figure <a href="topics-covered-2.html#fig:tsneicon">4.1</a>), as the third item (more precisely, the third item in the dimension reduction category). Alternatively, from the main menu, <strong>Clusters &gt; t-SNE</strong> gets the process started.</p>
+<p>To illustrate these methods, the same ten bank indicators are used as in the previous chapter (for a full list, see
+Section <a href="classic-metric-scaling.html#MDSimplementation">3.2.2</a>).</p>
+<p>The main dialog is the <strong>t-SNE Settings</strong> panel, shown in Figure <a href="implementation-2.html#fig:tsnesettings">4.2</a>. The left-hand side contains the list of available variables as well as several parameters that can be specified to fine tune the algorithm. Both <strong>Euclidean</strong> and <strong>Manhattan</strong> distance metrics are available for the <strong>Distance Function</strong> (to compute the probability functions), with <strong>Euclidean</strong> as the default. As before, the <strong>Standardize (Z)</strong> is the default <strong>Transformation</strong>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsnesettings"></span>
+<img src="pics/pics22/22_01_tsnesettings.png" alt="t-SNE Settings" width="80%" />
+<p class="caption">
+Figure 4.2: t-SNE Settings
+</p>
+</div>
+<p>On the right-hand side of the interface are two major panels. The top consists of a space that is used to track the changes in the two-dimensional scatter plot as the iterations proceed. The bottom panel gives further quantitative information on the evolution of the quality of the result, reported for every 50 iterations. This lists a value for the <strong>error</strong>, i.e., the cost function evaluated at that stage. The table provides an indication of how the process is converging to a stable state.</p>
+<p>In-between the two result panes on the right is a small control panel to adjust the speed of the animation, as well as allowing to pause and resume as the iterations proceed (see Section <a href="implementation-2.html#tsneanimation">4.4.1</a>).</p>
+<p>With all the parameters left to their default settings, the <strong>Run</strong> button populates the panels on the right-hand side.
+Figure <a href="implementation-2.html#fig:tsnefulliteration">4.3</a> shows the result after the default 5000 iterations, with a <strong>final cost</strong> of 0.714386. The top panel contains the familiar scatter plot of
+the t-SNE coordinates in two dimensions. The bottom pane (only partly shown) lists the <strong>final cost</strong> as well as the <strong>error</strong> for every 50 iterations. It shows that the error has been hovering around a similar value for (at least) the last 500 iterations.</p>
+<p>In the implementation in <code>GeoDa</code>, the final cost value listed (0.714386) does not exactly equal the result for the error at the last iteration (0.713598). This is due to the use of the Barnes-Hut approximation (Section <a href="t-sne.html#BarnesHutQ">4.3.2.2</a>).<a href="#fn19" class="footnote-ref" id="fnref19"><sup>19</sup></a></p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsnefulliteration"></span>
+<img src="pics/pics22/22_02_tsne_fulliteration.png" alt="t-SNE after full iteration - default settings" width="50%" />
+<p class="caption">
+Figure 4.3: t-SNE after full iteration - default settings
+</p>
+</div>
+<p>With the final result in hand, selecting the <strong>Save</strong> button brings up the familiar dialog to specify the variable names to be saved to the data table (defaults are <strong>V1</strong> and <strong>V2</strong>, but here set to <strong>V1tsne</strong> and <strong>V2tsne</strong>). Once these coordinate variables are specified, the final scatter plot is generated in a separate window, as illustrated in Figure <a href="implementation-2.html#fig:tsnecoordinates">4.4</a>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsnecoordinates"></span>
+<img src="pics/pics22/22_03_tsne_coordinates.png" alt="t-SNE 2D Coordinates" width="60%" />
+<p class="caption">
+Figure 4.4: t-SNE 2D Coordinates
+</p>
+</div>
+<p>At the bottom of the graph is a listing of the variables used in the analysis, as well as the <strong>final cost</strong> (0.714), the <strong>rank correlation</strong> (0.640), and the number of <strong>iterations</strong> (the default 5000). Since the t-SNE optimization algorithm is not based on a specific stopping criterion, unless the process is somehow paused
+(see Section <a href="implementation-2.html#tsneanimation">4.4.1</a>), the number of iterations will always correspond to what is specified in the options panel. However, this does not mean that it necessarily has resulted in a stable optimum. In practice, one therefore needs to pay close attention to the point pattern of the iterations as they proceed.</p>
+<p>The <strong>final cost</strong> is not comparable to the objective function for MDS, since it is not based on a stress function. On the other hand, the rank correlation is a rough global measure of the correspondence between the relative distances and remains a valid measure. However, it should be kept in mind that t-SNE is geared to optimize <em>local</em> distances, so a global performance measure is not necessarily the best measure of performance.</p>
+<div id="inspecting-the-iterations" class="section level4 hasAnchor" number="4.4.0.1">
+<h4><span class="header-section-number">4.4.0.1</span> Inspecting the iterations<a href="implementation-2.html#inspecting-the-iterations" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The bottom panel allows for an inspection of the results for the <strong>error</strong> at each iteration. A more visual representation of the change in
+point configurations can be found by manipulating the <strong>Iteration</strong> button in the top panel. As the button is moved to the left, the change in configuration is illustrated in the graph as the optimization process proceeds.</p>
+<p>This is particularly illuminating in the beginning stages of the algorithm, where substantial jumps can be observed. For example, in Figure <a href="implementation-2.html#fig:tsneiter1">4.5</a>, the <strong>Iteration</strong> is shown for two early results, one at iteration 250 (error 54.7166) and one shortly afterwards, at iteration 300 (error 0.852884). This is the point in the solution process where initial very chaotic solutions (jumping from one side of the graph to the other) begin to stabilize to a more circular cloud shape.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsneiter1"></span>
+<img src="pics/pics22/22_04_tsne_iterations1.png" alt="Inspecting interations of t-SNE algorithm: 250 and 300" width="80%" />
+<p class="caption">
+Figure 4.5: Inspecting interations of t-SNE algorithm: 250 and 300
+</p>
+</div>
+<p>This process continues until a certain degree of stability is obtained, after which the changes become marginal. For example, in Figure <a href="implementation-2.html#fig:tsneiter2">4.6</a>, the results at 2500 iterations (error 0.71491) and at 4000 iterations (error 0.715028) are shown, which portray a very similar pattern with almost identical error measures, near impossible to distinguish from the final solution in Figure <a href="implementation-2.html#fig:tsnefulliteration">4.3</a>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsneiter2"></span>
+<img src="pics/pics22/22_05_tsne_iterations2.png" alt="Inspecting interations of t-SNE algorithm: 1000 and 3000" width="80%" />
+<p class="caption">
+Figure 4.6: Inspecting interations of t-SNE algorithm: 1000 and 3000
+</p>
+</div>
+</div>
+<div id="tsneanimation" class="section level3 hasAnchor" number="4.4.1">
+<h3><span class="header-section-number">4.4.1</span> Animation<a href="implementation-2.html#tsneanimation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As mentioned, with the default settings, the optimization runs its full course for the number of iterations specified in the options. The <strong>Speed</strong> button below the graph on the right-hand side allows for the process to be slowed down for visualization purposes, by moving the button to the left. This provides a very detailed view of the way the optimization proceeds, gets trapped in local optima and then manages to move out of them.</p>
+<p>In addition, the pause button (<strong>||</strong>) can temporarily halt the process. The resume button (<strong>&gt;</strong>) continues the optimization. The iteration count is given below the graph and in the bottom panel the progression of the cost minimization can be followed.</p>
+<p>In this implementation, the pause button is different from the <strong>Stop</strong> button that is situated below the options in the left-hand panel. The latter ends the iterations and freezes the result, without the option to resume. However once frozen, one can move back through the previous sequence of iterations by moving the <strong>Iteration</strong> button to the left.</p>
+</div>
+<div id="tuning-the-optimization" class="section level3 hasAnchor" number="4.4.2">
+<h3><span class="header-section-number">4.4.2</span> Tuning the Optimization<a href="implementation-2.html#tuning-the-optimization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The number of options to tune the optimization algorithm may seem a bit overwhelming. However, in many instances, the default settings will be fine, although some experimenting is always a good idea.</p>
+<p>To illustrate the effect of some of the options, changes in three central parameters are illustrated in turn: <strong>Theta</strong>, <strong>Perplexity</strong>, and the <strong>Iteration Switch</strong> for the <strong>Momentum</strong>.</p>
+<div id="theta" class="section level4 hasAnchor" number="4.4.2.1">
+<h4><span class="header-section-number">4.4.2.1</span> Theta<a href="implementation-2.html#theta" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The Barnes-Hut algorithm implemented for t-SNE sets the <strong>Theta</strong> (<span class="math inline">\(\theta\)</span>) parameter to 0.5 by default. This is the criterion that determines the extent of simplification for the <span class="math inline">\(q_{ij}\)</span> measures in the gradient equation. The parameter is primarily intended to allow the algorithm to scale up to large data sets.</p>
+<p>In smaller data sets, like in the example considered here, this may be set to zero, which can speed up the solution since the actual distances are used, rather than a proxy. The result is shown in Figure <a href="implementation-2.html#fig:tsnethetazero">4.7</a>. The <strong>final cost</strong> is 0.737581 with a rank correlation of 0.635, both slightly worse than the default. In this case, convergence is reached after fewer than 1000 iterations, somewhat faster than for the default case. Also, in this instance, there is no difference between the <strong>error</strong> at the last iteration and the <strong>final cost</strong>, since no Barnes-Hut simplification is carried out.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsnethetazero"></span>
+<img src="pics/pics22/22_06_tsne_theta0.png" alt="t-SNE 2D Coordinates for theta=0" width="60%" />
+<p class="caption">
+Figure 4.7: t-SNE 2D Coordinates for theta=0
+</p>
+</div>
+</div>
+<div id="perplexity" class="section level4 hasAnchor" number="4.4.2.2">
+<h4><span class="header-section-number">4.4.2.2</span> Perplexity<a href="implementation-2.html#perplexity" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The second parameter to adjust is the <strong>Perplexity</strong> (with <strong>Theta</strong> set back to its default value). This is a rough proxy for the number of neighbors and is by default set to a value of 30. The results for a value of 50 <span class="citation">(the highest suggested by <a href="references.html#ref-vanderMaatenHinton:08">van der Maaten and Hinton 2008</a>)</span> are visualized
+in Figure <a href="implementation-2.html#fig:tsneperplex">4.8</a>. Compared to the previous results, the cost is much lower at 0.540604, and a higher rank correlation of 0.689. Convergence is reached after about 1600 iterations.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsneperplex"></span>
+<img src="pics/pics22/22_07_tsne_perplex.png" alt="t-SNE 2D Coordinates for perplexity=50" width="60%" />
+<p class="caption">
+Figure 4.8: t-SNE 2D Coordinates for perplexity=50
+</p>
+</div>
+</div>
+<div id="iteration-momentum-switch" class="section level4 hasAnchor" number="4.4.2.3">
+<h4><span class="header-section-number">4.4.2.3</span> Iteration momentum switch<a href="implementation-2.html#iteration-momentum-switch" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The final adjustment is to the <strong>Iteration Switch</strong> for the <strong>Momentum</strong> parameter, which decides at which point in the iterations the <strong>Momentum</strong> moves from 0.5 to 0.8. The default value is 250. With <strong>Perplexity</strong> left at 50, a change of the <strong>Iteration Switch</strong> to 100 obtains less chaotic solutions much sooner than in the previous cases. The switch happens between 100 and 150 iterations. The end result, shown in Figure <a href="implementation-2.html#fig:tsnemom">4.9</a>, is the best achieved so far: the <strong>final cost</strong> is 0.525096 with a rank correlation of 0.700.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsnemom"></span>
+<img src="pics/pics22/22_08_tsne_mom.png" alt="t-SNE 2D Coordinates for perplexity=50, momentum=100" width="60%" />
+<p class="caption">
+Figure 4.9: t-SNE 2D Coordinates for perplexity=50, momentum=100
+</p>
+</div>
+<p>Further experimentation with the various parameters can provide deep insight into the dynamics of this complex algorithm, although the specifics will vary from case to case. Also, as argued in <span class="citation">van der Maaten (<a href="references.html#ref-vanderMaaten:14">2014</a>)</span>, the default settings are an excellent starting point.</p>
+</div>
+</div>
+<div id="interpretation-and-spatialization" class="section level3 hasAnchor" number="4.4.3">
+<h3><span class="header-section-number">4.4.3</span> Interpretation and Spatialization<a href="implementation-2.html#interpretation-and-spatialization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>All the visualization options reviewed for classic MDS in Chapter <a href="CHMDS.html#CHMDS">3</a> can be applied to the t-SNE solutions, in the same way
+as described in Sections <a href="vizmds.html#vizmds">3.4</a> and <a href="spatializemds.html#spatializemds">3.5</a>. This includes the incorporation of a categorical variable that is visualized in the coordinate plot (see Section <a href="vizmds.html#MDScategories">3.4.2</a>). In addition, for t-SNE, those categories are also shown during the iterations and animations in the top right
+panel of Figure <a href="implementation-2.html#fig:tsnesettings">4.2</a>. Otherwise, everything operates as discussed previously.</p>
+<p>One aspect that remains to be investigated is the extent to which the t-SNE approach yields solutions that provide a match with geographic neighbors. This would be reflected in
+a nearest neighbor match test based on t-SNE nearest neighbors.</p>
+<div id="nearest-neighbor-match-test" class="section level4 hasAnchor" number="4.4.3.1">
+<h4><span class="header-section-number">4.4.3.1</span> Nearest neighbor match test<a href="implementation-2.html#nearest-neighbor-match-test" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The nearest neighbor match test is illustrated for the coordinates of the latest t-SNE results, <strong>V1mom</strong> and
+<strong>V2mom</strong>. The k-nearest neighbors with k=6 are matched to the geographical k-nearest neighbors. The corresponding unique values cardinality map is depicted in Figure <a href="implementation-2.html#fig:tsnemomnn">4.10</a>. Compared to the MDS results in
+Figure <a href="spatializemds.html#fig:mdslocalnbr">3.17</a> and the standard results in Figure <a href="spatializemds.html#fig:k6localnbr">3.18</a>, the largest number of common neighbors is four, obtained for one observation (the Cassa Raiffeisen in Latsch in the Trentino-Alto Adige Region, observation 67). The associated probability is 0.000001, suggesting very strong evidence of a multivariate local cluster. In addition, there are 6 observations with three common neighbors (p=0.000133), and 23 with two common neighbors (p=0.006275). As shown in Section <a href="spatializemds.html#mdsneighbormatch">3.5.3</a>, the result with one common neighbor cannot be deemed to be significant (p=0.125506).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:tsnemomnn"></span>
+<img src="pics/pics22/22_09_tsne_mom_nnm.png" alt="Nearest Neighbor Match Test for t-SNE" width="60%" />
+<p class="caption">
+Figure 4.10: Nearest Neighbor Match Test for t-SNE
+</p>
+</div>
+<p>The cluster analysis based on the t-SNE computations yields the most significant clusters in the current example. This is somewhat to be expected, since the method stresses <em>local</em> similarities between the higher and lower embedded dimension. Many identified locations match the standard cluster results, but several are also in different locations. The involved trade offs remain to be further investigated.</p>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="19">
+<li id="fn19"><p>As detailed in Section <a href="t-sne.html#BarnesHutQ">4.3.2.2</a>, when <strong>Theta</strong> is not zero, several values of <span class="math inline">\(q_{ij}\)</span> are replaced by the center of the corresponding quadtree block. The <strong>final cost</strong> reported is computed with the values for all <span class="math inline">\(i-j\)</span> pairs included in the calculation, and does not use the simplified <span class="math inline">\(q_{ij}\)</span>, whereas the <strong>error</strong> reported for each iteration uses the simplified version.<a href="implementation-2.html#fnref19" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="t-sne.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="comparing-distance-preserving-methods.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/21b.DistPreservingb.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

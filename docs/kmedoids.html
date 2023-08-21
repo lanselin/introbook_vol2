@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>7.3 K-Medoids | An Introduction to Spatial Data Science with GeoDa</title>
+  <meta name="description" content="GeoDa" />
+  <meta name="generator" content="bookdown 0.33 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="7.3 K-Medoids | An Introduction to Spatial Data Science with GeoDa" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="GeoDa" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="7.3 K-Medoids | An Introduction to Spatial Data Science with GeoDa" />
+  
+  <meta name="twitter:description" content="GeoDa" />
+  
+
+<meta name="author" content="Luc Anselin" />
+
+
+<meta name="date" content="2023-08-20" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="k-medians.html"/>
+<link rel="next" href="CHSpectralClustering.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">An Introduction to Spatial Data Science</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a>
+<ul>
+<li class="chapter" data-level="" data-path="acknowledgments.html"><a href="acknowledgments.html"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="about-the-author.html"><a href="about-the-author.html"><i class="fa fa-check"></i>About the Author</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="overview-of-volume-2.html"><a href="overview-of-volume-2.html"><i class="fa fa-check"></i><b>1.1</b> Overview of Volume 2</a></li>
+<li class="chapter" data-level="1.2" data-path="sample-data-sets.html"><a href="sample-data-sets.html"><i class="fa fa-check"></i><b>1.2</b> Sample Data Sets</a></li>
+</ul></li>
+<li class="part"><span><b>I Dimension Reduction</b></span></li>
+<li class="chapter" data-level="2" data-path="CHPCA.html"><a href="CHPCA.html"><i class="fa fa-check"></i><b>2</b> Principal Component Analysis (PCA)</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="topics-covered.html"><a href="topics-covered.html"><i class="fa fa-check"></i><b>2.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html"><i class="fa fa-check"></i><b>2.2</b> Matrix Algebra Review</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#eigenvalues-and-eigenvectors"><i class="fa fa-check"></i><b>2.2.1</b> Eigenvalues and eigenvectors</a></li>
+<li class="chapter" data-level="2.2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#matrix-decompositions"><i class="fa fa-check"></i><b>2.2.2</b> Matrix decompositions</a>
+<ul>
+<li class="chapter" data-level="2.2.2.1" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#spectraldecomposition"><i class="fa fa-check"></i><b>2.2.2.1</b> Spectral decomposition</a></li>
+<li class="chapter" data-level="2.2.2.2" data-path="matrix-algebra-review.html"><a href="matrix-algebra-review.html#svd"><i class="fa fa-check"></i><b>2.2.2.2</b> Singular value decomposition (SVD)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="principal-components.html"><a href="principal-components.html"><i class="fa fa-check"></i><b>2.3</b> Principal Components</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="principal-components.html"><a href="principal-components.html#implementation"><i class="fa fa-check"></i><b>2.3.1</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="2.3.1.1" data-path="principal-components.html"><a href="principal-components.html#saving-the-principal-components"><i class="fa fa-check"></i><b>2.3.1.1</b> Saving the principal components</a></li>
+<li class="chapter" data-level="2.3.1.2" data-path="principal-components.html"><a href="principal-components.html#saving-the-result-summary"><i class="fa fa-check"></i><b>2.3.1.2</b> Saving the result summary</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3.2" data-path="principal-components.html"><a href="principal-components.html#pcainterpretation"><i class="fa fa-check"></i><b>2.3.2</b> Interpretation</a>
+<ul>
+<li class="chapter" data-level="2.3.2.1" data-path="principal-components.html"><a href="principal-components.html#pcaexplainedvar"><i class="fa fa-check"></i><b>2.3.2.1</b> Explained variance</a></li>
+<li class="chapter" data-level="2.3.2.2" data-path="principal-components.html"><a href="principal-components.html#variable-loadings"><i class="fa fa-check"></i><b>2.3.2.2</b> Variable loadings</a></li>
+<li class="chapter" data-level="2.3.2.3" data-path="principal-components.html"><a href="principal-components.html#loadingsandpca"><i class="fa fa-check"></i><b>2.3.2.3</b> Variable loadings and principal components</a></li>
+<li class="chapter" data-level="2.3.2.4" data-path="principal-components.html"><a href="principal-components.html#substantive-interpretation---squared-correlation"><i class="fa fa-check"></i><b>2.3.2.4</b> Substantive interpretation - squared correlation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="vizpca.html"><a href="vizpca.html"><i class="fa fa-check"></i><b>2.4</b> Visualizing principal components</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="vizpca.html"><a href="vizpca.html#scatter-plot"><i class="fa fa-check"></i><b>2.4.1</b> Scatter plot</a></li>
+<li class="chapter" data-level="2.4.2" data-path="vizpca.html"><a href="vizpca.html#multivariate-decomposition"><i class="fa fa-check"></i><b>2.4.2</b> Multivariate decomposition</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html"><i class="fa fa-check"></i><b>2.5</b> Spatializing Principal Components</a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#principal-component-map"><i class="fa fa-check"></i><b>2.5.1</b> Principal component map</a></li>
+<li class="chapter" data-level="2.5.2" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#univariate-cluster-map"><i class="fa fa-check"></i><b>2.5.2</b> Univariate cluster map</a></li>
+<li class="chapter" data-level="2.5.3" data-path="spatializing-principal-components.html"><a href="spatializing-principal-components.html#principal-components-as-multivariate-cluster-maps"><i class="fa fa-check"></i><b>2.5.3</b> Principal components as multivariate cluster maps</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="CHMDS.html"><a href="CHMDS.html"><i class="fa fa-check"></i><b>3</b> Multidimensional Scaling (MDS)</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="topics-covered-1.html"><a href="topics-covered-1.html"><i class="fa fa-check"></i><b>3.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="3.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html"><i class="fa fa-check"></i><b>3.2</b> Classic Metric Scaling</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#mathematical-details"><i class="fa fa-check"></i><b>3.2.1</b> Mathematical Details</a>
+<ul>
+<li class="chapter" data-level="3.2.1.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#classic-metric-mds-and-principal-components"><i class="fa fa-check"></i><b>3.2.1.1</b> Classic metric MDS and principal components</a></li>
+<li class="chapter" data-level="3.2.1.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#poweriteration"><i class="fa fa-check"></i><b>3.2.1.2</b> Power iteration method</a></li>
+<li class="chapter" data-level="3.2.1.3" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#Gramanddissimilarity"><i class="fa fa-check"></i><b>3.2.1.3</b> Dissimilarity matrix</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#MDSimplementation"><i class="fa fa-check"></i><b>3.2.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="3.2.2.1" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#saving-the-mds-coordinates"><i class="fa fa-check"></i><b>3.2.2.1</b> Saving the MDS coordinates</a></li>
+<li class="chapter" data-level="3.2.2.2" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#mds-and-pca"><i class="fa fa-check"></i><b>3.2.2.2</b> MDS and PCA</a></li>
+<li class="chapter" data-level="3.2.2.3" data-path="classic-metric-scaling.html"><a href="classic-metric-scaling.html#power-approximation"><i class="fa fa-check"></i><b>3.2.2.3</b> Power approximation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="smacof.html"><a href="smacof.html"><i class="fa fa-check"></i><b>3.3</b> SMACOF</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="smacof.html"><a href="smacof.html#mathematical-details-1"><i class="fa fa-check"></i><b>3.3.1</b> Mathematical Details</a></li>
+<li class="chapter" data-level="3.3.2" data-path="smacof.html"><a href="smacof.html#implementation-1"><i class="fa fa-check"></i><b>3.3.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="3.3.2.1" data-path="smacof.html"><a href="smacof.html#manhattan-block-distance"><i class="fa fa-check"></i><b>3.3.2.1</b> Manhattan block distance</a></li>
+<li class="chapter" data-level="3.3.2.2" data-path="smacof.html"><a href="smacof.html#smacofvsclassic"><i class="fa fa-check"></i><b>3.3.2.2</b> SMACOF vs classic metric MDS</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="vizmds.html"><a href="vizmds.html"><i class="fa fa-check"></i><b>3.4</b> Visualizing MDS</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="vizmds.html"><a href="vizmds.html#mds-and-parallel-coordinate-plot"><i class="fa fa-check"></i><b>3.4.1</b> MDS and Parallel Coordinate Plot</a></li>
+<li class="chapter" data-level="3.4.2" data-path="vizmds.html"><a href="vizmds.html#MDScategories"><i class="fa fa-check"></i><b>3.4.2</b> MDS Scatter Plot with Categories</a></li>
+<li class="chapter" data-level="3.4.3" data-path="vizmds.html"><a href="vizmds.html#d-mds"><i class="fa fa-check"></i><b>3.4.3</b> 3-D MDS</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="spatializemds.html"><a href="spatializemds.html"><i class="fa fa-check"></i><b>3.5</b> Spatializing MDS</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="spatializemds.html"><a href="spatializemds.html#mds-and-map"><i class="fa fa-check"></i><b>3.5.1</b> MDS and Map</a></li>
+<li class="chapter" data-level="3.5.2" data-path="spatializemds.html"><a href="spatializemds.html#mds-spatial-weights"><i class="fa fa-check"></i><b>3.5.2</b> MDS Spatial Weights</a>
+<ul>
+<li class="chapter" data-level="3.5.2.1" data-path="spatializemds.html"><a href="spatializemds.html#attribute-and-geographical-neighbors"><i class="fa fa-check"></i><b>3.5.2.1</b> Attribute and geographical neighbors</a></li>
+<li class="chapter" data-level="3.5.2.2" data-path="spatializemds.html"><a href="spatializemds.html#MDSneighborsimilarity"><i class="fa fa-check"></i><b>3.5.2.2</b> Common coverage percentage</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5.3" data-path="spatializemds.html"><a href="spatializemds.html#mdsneighbormatch"><i class="fa fa-check"></i><b>3.5.3</b> MDS Neighbor Match Test</a></li>
+<li class="chapter" data-level="3.5.4" data-path="spatializemds.html"><a href="spatializemds.html#hdbscan-and-mds"><i class="fa fa-check"></i><b>3.5.4</b> HDBSCAN and MDS</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="CHSNE.html"><a href="CHSNE.html"><i class="fa fa-check"></i><b>4</b> Stochastic Neighbor Embedding (SNE)</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="topics-covered-2.html"><a href="topics-covered-2.html"><i class="fa fa-check"></i><b>4.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="4.2" data-path="basics-of-information-theory.html"><a href="basics-of-information-theory.html"><i class="fa fa-check"></i><b>4.2</b> Basics of Information Theory</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="basics-of-information-theory.html"><a href="basics-of-information-theory.html#stochastic-neighbors"><i class="fa fa-check"></i><b>4.2.1</b> Stochastic Neighbors</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="t-sne.html"><a href="t-sne.html"><i class="fa fa-check"></i><b>4.3</b> t-SNE</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="t-sne.html"><a href="t-sne.html#cost-function-and-optimization"><i class="fa fa-check"></i><b>4.3.1</b> Cost Function and Optimization</a></li>
+<li class="chapter" data-level="4.3.2" data-path="t-sne.html"><a href="t-sne.html#large-data-applications-barnes-hut"><i class="fa fa-check"></i><b>4.3.2</b> Large Data Applications (Barnes-Hut)</a>
+<ul>
+<li class="chapter" data-level="4.3.2.1" data-path="t-sne.html"><a href="t-sne.html#simplification-of-p"><i class="fa fa-check"></i><b>4.3.2.1</b> Simplification of <span class="math inline">\(P\)</span></a></li>
+<li class="chapter" data-level="4.3.2.2" data-path="t-sne.html"><a href="t-sne.html#BarnesHutQ"><i class="fa fa-check"></i><b>4.3.2.2</b> Simplification of <span class="math inline">\(Q\)</span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="implementation-2.html"><a href="implementation-2.html"><i class="fa fa-check"></i><b>4.4</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="4.4.0.1" data-path="implementation-2.html"><a href="implementation-2.html#inspecting-the-iterations"><i class="fa fa-check"></i><b>4.4.0.1</b> Inspecting the iterations</a></li>
+<li class="chapter" data-level="4.4.1" data-path="implementation-2.html"><a href="implementation-2.html#tsneanimation"><i class="fa fa-check"></i><b>4.4.1</b> Animation</a></li>
+<li class="chapter" data-level="4.4.2" data-path="implementation-2.html"><a href="implementation-2.html#tuning-the-optimization"><i class="fa fa-check"></i><b>4.4.2</b> Tuning the Optimization</a>
+<ul>
+<li class="chapter" data-level="4.4.2.1" data-path="implementation-2.html"><a href="implementation-2.html#theta"><i class="fa fa-check"></i><b>4.4.2.1</b> Theta</a></li>
+<li class="chapter" data-level="4.4.2.2" data-path="implementation-2.html"><a href="implementation-2.html#perplexity"><i class="fa fa-check"></i><b>4.4.2.2</b> Perplexity</a></li>
+<li class="chapter" data-level="4.4.2.3" data-path="implementation-2.html"><a href="implementation-2.html#iteration-momentum-switch"><i class="fa fa-check"></i><b>4.4.2.3</b> Iteration momentum switch</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4.3" data-path="implementation-2.html"><a href="implementation-2.html#interpretation-and-spatialization"><i class="fa fa-check"></i><b>4.4.3</b> Interpretation and Spatialization</a>
+<ul>
+<li class="chapter" data-level="4.4.3.1" data-path="implementation-2.html"><a href="implementation-2.html#nearest-neighbor-match-test"><i class="fa fa-check"></i><b>4.4.3.1</b> Nearest neighbor match test</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html"><i class="fa fa-check"></i><b>4.5</b> Comparing Distance Preserving Methods</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html#comparing-t-sne-options"><i class="fa fa-check"></i><b>4.5.1</b> Comparing t-SNE Options</a></li>
+<li class="chapter" data-level="4.5.2" data-path="comparing-distance-preserving-methods.html"><a href="comparing-distance-preserving-methods.html#local-fit-with-common-coverage-percentage"><i class="fa fa-check"></i><b>4.5.2</b> Local Fit with Common Coverage Percentage</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>II Classic Clustering</b></span></li>
+<li class="chapter" data-level="5" data-path="CHhierarchicalclustering.html"><a href="CHhierarchicalclustering.html"><i class="fa fa-check"></i><b>5</b> Hierarchical Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="topics-covered-3.html"><a href="topics-covered-3.html"><i class="fa fa-check"></i><b>5.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="5.2" data-path="dissimilarity.html"><a href="dissimilarity.html"><i class="fa fa-check"></i><b>5.2</b> Dissimilarity</a></li>
+<li class="chapter" data-level="5.3" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html"><i class="fa fa-check"></i><b>5.3</b> Agglomerative Clustering</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#linkage-and-updating-formula"><i class="fa fa-check"></i><b>5.3.1</b> Linkage and Updating Formula</a>
+<ul>
+<li class="chapter" data-level="5.3.1.1" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#single-linkage"><i class="fa fa-check"></i><b>5.3.1.1</b> Single linkage</a></li>
+<li class="chapter" data-level="5.3.1.2" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#complete-linkage"><i class="fa fa-check"></i><b>5.3.1.2</b> Complete linkage</a></li>
+<li class="chapter" data-level="5.3.1.3" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#average-linkage"><i class="fa fa-check"></i><b>5.3.1.3</b> Average linkage</a></li>
+<li class="chapter" data-level="5.3.1.4" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#wards-method"><i class="fa fa-check"></i><b>5.3.1.4</b> Ward’s method</a></li>
+<li class="chapter" data-level="5.3.1.5" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#illustration---single-linkage"><i class="fa fa-check"></i><b>5.3.1.5</b> Illustration - single linkage</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3.2" data-path="agglomerative-clustering.html"><a href="agglomerative-clustering.html#dendrogram"><i class="fa fa-check"></i><b>5.3.2</b> Dendrogram</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="implementation-3.html"><a href="implementation-3.html"><i class="fa fa-check"></i><b>5.4</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="implementation-3.html"><a href="implementation-3.html#hierarchicalvariables"><i class="fa fa-check"></i><b>5.4.1</b> Variable Settings Dialog</a></li>
+<li class="chapter" data-level="5.4.2" data-path="implementation-3.html"><a href="implementation-3.html#wards-method-1"><i class="fa fa-check"></i><b>5.4.2</b> Ward’s method</a></li>
+<li class="chapter" data-level="5.4.3" data-path="implementation-3.html"><a href="implementation-3.html#single-linkage-1"><i class="fa fa-check"></i><b>5.4.3</b> Single linkage</a></li>
+<li class="chapter" data-level="5.4.4" data-path="implementation-3.html"><a href="implementation-3.html#complete-linkage-1"><i class="fa fa-check"></i><b>5.4.4</b> Complete linkage</a></li>
+<li class="chapter" data-level="5.4.5" data-path="implementation-3.html"><a href="implementation-3.html#average-linkage-1"><i class="fa fa-check"></i><b>5.4.5</b> Average linkage</a></li>
+<li class="chapter" data-level="5.4.6" data-path="implementation-3.html"><a href="implementation-3.html#sensitivity-analysis"><i class="fa fa-check"></i><b>5.4.6</b> Sensitivity Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="CHPartioningCluster.html"><a href="CHPartioningCluster.html"><i class="fa fa-check"></i><b>6</b> Partioning Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="topics-covered-4.html"><a href="topics-covered-4.html"><i class="fa fa-check"></i><b>6.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="6.2" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html"><i class="fa fa-check"></i><b>6.2</b> The K Means Algorithm</a>
+<ul>
+<li class="chapter" data-level="" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#mathematical-details-2"><i class="fa fa-check"></i>Mathematical details</a></li>
+<li class="chapter" data-level="6.2.1" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#iterativerelocation"><i class="fa fa-check"></i><b>6.2.1</b> Iterative Relocation</a></li>
+<li class="chapter" data-level="6.2.2" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#the-choice-of-k"><i class="fa fa-check"></i><b>6.2.2</b> The Choice of K</a></li>
+<li class="chapter" data-level="6.2.3" data-path="the-k-means-algorithm.html"><a href="the-k-means-algorithm.html#kmeansplusplus"><i class="fa fa-check"></i><b>6.2.3</b> K-means++</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="implementation-4.html"><a href="implementation-4.html"><i class="fa fa-check"></i><b>6.3</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="implementation-4.html"><a href="implementation-4.html#digressionpca"><i class="fa fa-check"></i><b>6.3.1</b> Digression: Clustering with Dimension Reduction</a></li>
+<li class="chapter" data-level="6.3.2" data-path="implementation-4.html"><a href="implementation-4.html#cluster-parameters"><i class="fa fa-check"></i><b>6.3.2</b> Cluster Parameters</a></li>
+<li class="chapter" data-level="6.3.3" data-path="implementation-4.html"><a href="implementation-4.html#cluster-results"><i class="fa fa-check"></i><b>6.3.3</b> Cluster Results</a>
+<ul>
+<li class="chapter" data-level="6.3.3.1" data-path="implementation-4.html"><a href="implementation-4.html#adjustclusterlabels"><i class="fa fa-check"></i><b>6.3.3.1</b> Adjusting cluster labels</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3.4" data-path="implementation-4.html"><a href="implementation-4.html#kmeansoptions"><i class="fa fa-check"></i><b>6.3.4</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="6.3.4.1" data-path="implementation-4.html"><a href="implementation-4.html#initialization"><i class="fa fa-check"></i><b>6.3.4.1</b> Initialization</a></li>
+<li class="chapter" data-level="6.3.4.2" data-path="implementation-4.html"><a href="implementation-4.html#kmeanselbowplot"><i class="fa fa-check"></i><b>6.3.4.2</b> Selecting k – Elbow plot</a></li>
+<li class="chapter" data-level="6.3.4.3" data-path="implementation-4.html"><a href="implementation-4.html#standardization"><i class="fa fa-check"></i><b>6.3.4.3</b> Standardization</a></li>
+<li class="chapter" data-level="6.3.4.4" data-path="implementation-4.html"><a href="implementation-4.html#kmeansminbound"><i class="fa fa-check"></i><b>6.3.4.4</b> Minimum bound</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html"><i class="fa fa-check"></i><b>6.4</b> Cluster Categories as Variables</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html#conditional-box-plot"><i class="fa fa-check"></i><b>6.4.1</b> Conditional Box Plot</a></li>
+<li class="chapter" data-level="6.4.2" data-path="cluster-categories-as-variables.html"><a href="cluster-categories-as-variables.html#clusteraggregation"><i class="fa fa-check"></i><b>6.4.2</b> Aggregation by Cluster</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="CHAdvancedClustering.html"><a href="CHAdvancedClustering.html"><i class="fa fa-check"></i><b>7</b> Advanced Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="topics-covered-5.html"><a href="topics-covered-5.html"><i class="fa fa-check"></i><b>7.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="7.2" data-path="k-medians.html"><a href="k-medians.html"><i class="fa fa-check"></i><b>7.2</b> K-Medians</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="k-medians.html"><a href="k-medians.html#implementation-5"><i class="fa fa-check"></i><b>7.2.1</b> Implementation</a></li>
+<li class="chapter" data-level="7.2.2" data-path="k-medians.html"><a href="k-medians.html#options-and-sensitivity-analysis"><i class="fa fa-check"></i><b>7.2.2</b> Options and Sensitivity Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="kmedoids.html"><a href="kmedoids.html"><i class="fa fa-check"></i><b>7.3</b> K-Medoids</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="kmedoids.html"><a href="kmedoids.html#the-pam-algorithm-for-k-medoids"><i class="fa fa-check"></i><b>7.3.1</b> The PAM Algorithm for K-Medoids</a>
+<ul>
+<li class="chapter" data-level="7.3.1.1" data-path="kmedoids.html"><a href="kmedoids.html#build"><i class="fa fa-check"></i><b>7.3.1.1</b> Build</a></li>
+<li class="chapter" data-level="7.3.1.2" data-path="kmedoids.html"><a href="kmedoids.html#swap"><i class="fa fa-check"></i><b>7.3.1.2</b> Swap</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.2" data-path="kmedoids.html"><a href="kmedoids.html#improving-on-the-pam-algorithm"><i class="fa fa-check"></i><b>7.3.2</b> Improving on the PAM Algorithm</a>
+<ul>
+<li class="chapter" data-level="7.3.2.1" data-path="kmedoids.html"><a href="kmedoids.html#clara"><i class="fa fa-check"></i><b>7.3.2.1</b> CLARA</a></li>
+<li class="chapter" data-level="7.3.2.2" data-path="kmedoids.html"><a href="kmedoids.html#clarans"><i class="fa fa-check"></i><b>7.3.2.2</b> CLARANS</a></li>
+<li class="chapter" data-level="7.3.2.3" data-path="kmedoids.html"><a href="kmedoids.html#lab"><i class="fa fa-check"></i><b>7.3.2.3</b> LAB</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.3" data-path="kmedoids.html"><a href="kmedoids.html#kmedoidsimplementation"><i class="fa fa-check"></i><b>7.3.3</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="7.3.3.1" data-path="kmedoids.html"><a href="kmedoids.html#cluster-results-1"><i class="fa fa-check"></i><b>7.3.3.1</b> Cluster results</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3.4" data-path="kmedoids.html"><a href="kmedoids.html#options-and-sensitivity-analysis-1"><i class="fa fa-check"></i><b>7.3.4</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="7.3.4.1" data-path="kmedoids.html"><a href="kmedoids.html#clara-parameters"><i class="fa fa-check"></i><b>7.3.4.1</b> CLARA parameters</a></li>
+<li class="chapter" data-level="7.3.4.2" data-path="kmedoids.html"><a href="kmedoids.html#clarans-parameters"><i class="fa fa-check"></i><b>7.3.4.2</b> CLARANS parameters</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="CHSpectralClustering.html"><a href="CHSpectralClustering.html"><i class="fa fa-check"></i><b>8</b> Spectral Clustering</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="topics-covered-6.html"><a href="topics-covered-6.html"><i class="fa fa-check"></i><b>8.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="8.2" data-path="spectral-clustering-logic.html"><a href="spectral-clustering-logic.html"><i class="fa fa-check"></i><b>8.2</b> Spectral Clustering Logic</a></li>
+<li class="chapter" data-level="8.3" data-path="clustering-as-a-graph-partitioning-problem.html"><a href="clustering-as-a-graph-partitioning-problem.html"><i class="fa fa-check"></i><b>8.3</b> Clustering as a Graph Partitioning Problem</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="clustering-as-a-graph-partitioning-problem.html"><a href="clustering-as-a-graph-partitioning-problem.html#graph-laplacian"><i class="fa fa-check"></i><b>8.3.1</b> Graph Laplacian</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html"><i class="fa fa-check"></i><b>8.4</b> The Spectral Clustering Algorithm</a>
+<ul>
+<li class="chapter" data-level="8.4.1" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#spectraladjacency"><i class="fa fa-check"></i><b>8.4.1</b> Adjacency matrix</a></li>
+<li class="chapter" data-level="8.4.2" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#clustering-on-the-eigenvectors-of-the-graph-laplacian"><i class="fa fa-check"></i><b>8.4.2</b> Clustering on the Eigenvectors of the Graph Laplacian</a></li>
+<li class="chapter" data-level="8.4.3" data-path="the-spectral-clustering-algorithm.html"><a href="the-spectral-clustering-algorithm.html#spectralparameters"><i class="fa fa-check"></i><b>8.4.3</b> Spectral Clustering Parameters</a></li>
+</ul></li>
+<li class="chapter" data-level="8.5" data-path="implementation-6.html"><a href="implementation-6.html"><i class="fa fa-check"></i><b>8.5</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="8.5.1" data-path="implementation-6.html"><a href="implementation-6.html#cluster-results-2"><i class="fa fa-check"></i><b>8.5.1</b> Cluster results</a></li>
+<li class="chapter" data-level="8.5.2" data-path="implementation-6.html"><a href="implementation-6.html#options-and-sensitivity-analysis-2"><i class="fa fa-check"></i><b>8.5.2</b> Options and Sensitivity Analysis</a>
+<ul>
+<li class="chapter" data-level="8.5.2.1" data-path="implementation-6.html"><a href="implementation-6.html#k-nearest-neighbor-affinity-matrix"><i class="fa fa-check"></i><b>8.5.2.1</b> K-nearest neighbor affinity matrix</a></li>
+<li class="chapter" data-level="8.5.2.2" data-path="implementation-6.html"><a href="implementation-6.html#gaussian-kernel-affinity-matrix"><i class="fa fa-check"></i><b>8.5.2.2</b> Gaussian kernel affinity matrix</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>III Spatial Clustering</b></span></li>
+<li class="chapter" data-level="9" data-path="CHspatialclassicclustering.html"><a href="CHspatialclassicclustering.html"><i class="fa fa-check"></i><b>9</b> Spatializing Classic Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="topics-covered-7.html"><a href="topics-covered-7.html"><i class="fa fa-check"></i><b>9.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="9.2" data-path="clustering-on-geographic-coordinates.html"><a href="clustering-on-geographic-coordinates.html"><i class="fa fa-check"></i><b>9.2</b> Clustering on Geographic Coordinates</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="clustering-on-geographic-coordinates.html"><a href="clustering-on-geographic-coordinates.html#implementation-7"><i class="fa fa-check"></i><b>9.2.1</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="including-geographical-coordinates-in-the-feature-set.html"><a href="including-geographical-coordinates-in-the-feature-set.html"><i class="fa fa-check"></i><b>9.3</b> Including Geographical Coordinates in the Feature Set</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="including-geographical-coordinates-in-the-feature-set.html"><a href="including-geographical-coordinates-in-the-feature-set.html#implementation-8"><i class="fa fa-check"></i><b>9.3.1</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html"><i class="fa fa-check"></i><b>9.4</b> Weighted Optimization of Geographical and Attribute Similarity</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#optimization"><i class="fa fa-check"></i><b>9.4.1</b> Optimization</a>
+<ul>
+<li class="chapter" data-level="9.4.1.1" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#connectivity-check"><i class="fa fa-check"></i><b>9.4.1.1</b> Connectivity check</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4.2" data-path="spatialweightedcluster.html"><a href="spatialweightedcluster.html#implementation-9"><i class="fa fa-check"></i><b>9.4.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="constructingspatialcontiguous.html"><a href="constructingspatialcontiguous.html"><i class="fa fa-check"></i><b>9.5</b> Constructing a Spatially Contiguous Solution</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="constructingspatialcontiguous.html"><a href="constructingspatialcontiguous.html#implementation-10"><i class="fa fa-check"></i><b>9.5.1</b> Implementation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="CHspatialhierarchical.html"><a href="CHspatialhierarchical.html"><i class="fa fa-check"></i><b>10</b> Spatially Constrained Clustering - Hierarchical Methods</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="topics-covered-8.html"><a href="topics-covered-8.html"><i class="fa fa-check"></i><b>10.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="10.2" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html"><i class="fa fa-check"></i><b>10.2</b> Spatially Constrained Hierarchical Clustering (SCHC)</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schcalgillustration"><i class="fa fa-check"></i><b>10.2.1</b> The Algorithm</a>
+<ul>
+<li class="chapter" data-level="10.2.1.1" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schccompletelinkage"><i class="fa fa-check"></i><b>10.2.1.1</b> SCHC Complete Linkage</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2.2" data-path="spatially-constrained-hierarchical-clustering-schc.html"><a href="spatially-constrained-hierarchical-clustering-schc.html#schcimplement"><i class="fa fa-check"></i><b>10.2.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="skater.html"><a href="skater.html"><i class="fa fa-check"></i><b>10.3</b> SKATER</a>
+<ul>
+<li class="chapter" data-level="10.3.1" data-path="skater.html"><a href="skater.html#skaterpruning"><i class="fa fa-check"></i><b>10.3.1</b> Pruning the Minimum Spanning Tree</a></li>
+<li class="chapter" data-level="10.3.2" data-path="skater.html"><a href="skater.html#implementation-11"><i class="fa fa-check"></i><b>10.3.2</b> Implementation</a>
+<ul>
+<li class="chapter" data-level="10.3.2.1" data-path="skater.html"><a href="skater.html#saveMST"><i class="fa fa-check"></i><b>10.3.2.1</b> Saving the Minimum Spanning Tree</a></li>
+<li class="chapter" data-level="10.3.2.2" data-path="skater.html"><a href="skater.html#setskaterminsize"><i class="fa fa-check"></i><b>10.3.2.2</b> Setting a minimum cluster size</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10.4" data-path="redcap.html"><a href="redcap.html"><i class="fa fa-check"></i><b>10.4</b> REDCAP</a>
+<ul>
+<li class="chapter" data-level="10.4.1" data-path="redcap.html"><a href="redcap.html#illustration---fullorder-completelinkage"><i class="fa fa-check"></i><b>10.4.1</b> Illustration - FullOrder-CompleteLinkage</a></li>
+<li class="chapter" data-level="10.4.2" data-path="redcap.html"><a href="redcap.html#redcapimplementation"><i class="fa fa-check"></i><b>10.4.2</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="10.5" data-path="assessment.html"><a href="assessment.html"><i class="fa fa-check"></i><b>10.5</b> Assessment</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="CHspatialpartition.html"><a href="CHspatialpartition.html"><i class="fa fa-check"></i><b>11</b> Spatially Constrained Clustering - Partitioning Methods</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="topics-covered-9.html"><a href="topics-covered-9.html"><i class="fa fa-check"></i><b>11.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="11.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html"><i class="fa fa-check"></i><b>11.2</b> Automatic Zoning Procedure (AZP)</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#azp-heuristic"><i class="fa fa-check"></i><b>11.2.1</b> AZP Heuristic</a>
+<ul>
+<li class="chapter" data-level="11.2.1.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#illustration"><i class="fa fa-check"></i><b>11.2.1.1</b> Illustration</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#tabu-search"><i class="fa fa-check"></i><b>11.2.2</b> Tabu Search</a></li>
+<li class="chapter" data-level="11.2.3" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#simulated-annealing"><i class="fa fa-check"></i><b>11.2.3</b> Simulated Annealing</a></li>
+<li class="chapter" data-level="11.2.4" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#arisel"><i class="fa fa-check"></i><b>11.2.4</b> ARiSeL</a></li>
+<li class="chapter" data-level="11.2.5" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#using-the-outcome-from-another-cluster-routine-as-the-initial-feasible-region"><i class="fa fa-check"></i><b>11.2.5</b> Using the Outcome from Another Cluster Routine as the Initial Feasible Region</a></li>
+<li class="chapter" data-level="11.2.6" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#implementation-12"><i class="fa fa-check"></i><b>11.2.6</b> Implementation</a></li>
+<li class="chapter" data-level="11.2.7" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#search-options"><i class="fa fa-check"></i><b>11.2.7</b> Search Options</a>
+<ul>
+<li class="chapter" data-level="11.2.7.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#local-search"><i class="fa fa-check"></i><b>11.2.7.1</b> Local Search</a></li>
+<li class="chapter" data-level="11.2.7.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#tabu-search-1"><i class="fa fa-check"></i><b>11.2.7.2</b> Tabu search</a></li>
+<li class="chapter" data-level="11.2.7.3" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#simulated-annealing-1"><i class="fa fa-check"></i><b>11.2.7.3</b> Simulated annealing</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2.8" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#initialization-options"><i class="fa fa-check"></i><b>11.2.8</b> Initialization Options</a>
+<ul>
+<li class="chapter" data-level="11.2.8.1" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#arisel-1"><i class="fa fa-check"></i><b>11.2.8.1</b> ARiSeL</a></li>
+<li class="chapter" data-level="11.2.8.2" data-path="automatic-zoning-procedure-azp.html"><a href="automatic-zoning-procedure-azp.html#initial-regions"><i class="fa fa-check"></i><b>11.2.8.2</b> Initial regions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11.3" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html"><i class="fa fa-check"></i><b>11.3</b> Max-P Region Problem</a>
+<ul>
+<li class="chapter" data-level="11.3.1" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#max-p-heuristic"><i class="fa fa-check"></i><b>11.3.1</b> Max-p Heuristic</a>
+<ul>
+<li class="chapter" data-level="11.3.1.1" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#illustration-1"><i class="fa fa-check"></i><b>11.3.1.1</b> Illustration</a></li>
+</ul></li>
+<li class="chapter" data-level="11.3.2" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#implementation-13"><i class="fa fa-check"></i><b>11.3.2</b> Implementation</a></li>
+<li class="chapter" data-level="11.3.3" data-path="max-p-region-problem.html"><a href="max-p-region-problem.html#sensitivity-analysis-1"><i class="fa fa-check"></i><b>11.3.3</b> Sensitivity Analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="part"><span><b>IV Assessment</b></span></li>
+<li class="chapter" data-level="12" data-path="CHclustervalidation.html"><a href="CHclustervalidation.html"><i class="fa fa-check"></i><b>12</b> Cluster Validation</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="topics-covered-10.html"><a href="topics-covered-10.html"><i class="fa fa-check"></i><b>12.1</b> Topics Covered</a></li>
+<li class="chapter" data-level="12.2" data-path="internal-validity.html"><a href="internal-validity.html"><i class="fa fa-check"></i><b>12.2</b> Internal Validity</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="internal-validity.html"><a href="internal-validity.html#traditional-measures-of-fit"><i class="fa fa-check"></i><b>12.2.1</b> Traditional Measures of Fit</a></li>
+<li class="chapter" data-level="12.2.2" data-path="internal-validity.html"><a href="internal-validity.html#clusterbalance"><i class="fa fa-check"></i><b>12.2.2</b> Balance</a></li>
+<li class="chapter" data-level="12.2.3" data-path="internal-validity.html"><a href="internal-validity.html#join-count-ratio"><i class="fa fa-check"></i><b>12.2.3</b> Join Count Ratio</a></li>
+<li class="chapter" data-level="12.2.4" data-path="internal-validity.html"><a href="internal-validity.html#compactness"><i class="fa fa-check"></i><b>12.2.4</b> Compactness</a></li>
+<li class="chapter" data-level="12.2.5" data-path="internal-validity.html"><a href="internal-validity.html#connectedness"><i class="fa fa-check"></i><b>12.2.5</b> Connectedness</a></li>
+<li class="chapter" data-level="12.2.6" data-path="internal-validity.html"><a href="internal-validity.html#implementation-14"><i class="fa fa-check"></i><b>12.2.6</b> Implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="external-validity.html"><a href="external-validity.html"><i class="fa fa-check"></i><b>12.3</b> External Validity</a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="external-validity.html"><a href="external-validity.html#classic-measures"><i class="fa fa-check"></i><b>12.3.1</b> Classic Measures</a>
+<ul>
+<li class="chapter" data-level="12.3.1.1" data-path="external-validity.html"><a href="external-validity.html#adjusted-rand-index"><i class="fa fa-check"></i><b>12.3.1.1</b> Adjusted Rand Index</a></li>
+<li class="chapter" data-level="12.3.1.2" data-path="external-validity.html"><a href="external-validity.html#normalized-information-distance"><i class="fa fa-check"></i><b>12.3.1.2</b> Normalized Information Distance</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3.2" data-path="external-validity.html"><a href="external-validity.html#visualizing-cluster-match"><i class="fa fa-check"></i><b>12.3.2</b> Visualizing Cluster Match</a>
+<ul>
+<li class="chapter" data-level="12.3.2.1" data-path="external-validity.html"><a href="external-validity.html#linking-cluster-maps"><i class="fa fa-check"></i><b>12.3.2.1</b> Linking Cluster Maps</a></li>
+<li class="chapter" data-level="12.3.2.2" data-path="external-validity.html"><a href="external-validity.html#cluster-match-map"><i class="fa fa-check"></i><b>12.3.2.2</b> Cluster Match Map</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="beyond-clustering.html"><a href="beyond-clustering.html"><i class="fa fa-check"></i><b>12.4</b> Beyond Clustering</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+<li> Copyright (c) 2023, Luc Anselin</li>
+<li> All Rights Reserved</li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Spatial Data Science with GeoDa</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="kmedoids" class="section level2 hasAnchor" number="7.3">
+<h2><span class="header-section-number">7.3</span> K-Medoids<a href="kmedoids.html#kmedoids" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The objective of the K-Medoids algorithm is to minimize the sum of the distances
+from the observations in each cluster to a <em>representative center</em> for that cluster.
+In contrast to K-Means and K-Medians, the cluster centers are actual observations and
+thus do not need to be computed separately (as mean or median).</p>
+<p>K-Medoids works with any
+dissimilarity matrix, since it only relies on inter-observation distances and does not require a mean or median center. When actual observations are available, the Manhattan distance is the preferred metric, since
+it is less affected by outliers. In addition, since the objective function is
+based on the sum of the actual distances instead of their squares, the influence of
+outliers is even smaller.<a href="#fn34" class="footnote-ref" id="fnref34"><sup>34</sup></a></p>
+<p>The objective function is expressed as finding the cluster assignments <span class="math inline">\(C(i)\)</span> such that, for a given <span class="math inline">\(k\)</span>:
+<span class="math display">\[\mbox{argmin}_{C(i)} \sum_{h=1}^k \sum_{i \in h} d_{i,h_c},\]</span>
+where <span class="math inline">\(h_c\)</span> is a representative center for cluster <span class="math inline">\(h\)</span> and <span class="math inline">\(d\)</span> is the distance metric used
+(from a dissimilarity matrix). As was the case for K-Means (and K-Medians), the problem is NP hard and
+an exact solution does not exist.</p>
+<p>The K-Medoids objective is identical in structure to that of a simple (unweighted) location-allocation
+facility location problem. Such problems consist of finding <span class="math inline">\(k\)</span> optimal locations among <span class="math inline">\(n\)</span> possibilities (the
+location part), and subsequently assigning the remaining observations to those centers
+(the allocation part).<a href="#fn35" class="footnote-ref" id="fnref35"><sup>35</sup></a></p>
+<p>The main approach to solve the K-Medoids problem is the so-called <em>partitioning around medoids</em> (PAM) algorithm
+of <span class="citation">Kaufman and Rousseeuw (<a href="references.html#ref-KaufmanRousseeuw:05">2005</a>)</span>.
+The logic underlying the PAM algorithm involves two stages, labeled <em>BUILD</em> and <em>SWAP</em>.</p>
+<div id="the-pam-algorithm-for-k-medoids" class="section level3 hasAnchor" number="7.3.1">
+<h3><span class="header-section-number">7.3.1</span> The PAM Algorithm for K-Medoids<a href="kmedoids.html#the-pam-algorithm-for-k-medoids" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In the <em>BUILD</em> stage, a set of <span class="math inline">\(k\)</span> starting centers are selected
+from the <span class="math inline">\(n\)</span> observations. In some implementations, this is a random selection, but <span class="citation">Kaufman and Rousseeuw (<a href="references.html#ref-KaufmanRousseeuw:05">2005</a>)</span>, and,
+more recently <span class="citation">Schubert and Rousseeuw (<a href="references.html#ref-SchubertRousseeuw:19">2019</a>)</span> prefer
+a step-wise procedure that optimizes the initial set.</p>
+<p>The main part of the algorithm consists of the <em>SWAP</em> stage. This
+proceeds in a greedy iterative manner by swapping a current center with a candidate from the
+remaining non-centers, as long as the objective function can be improved.<a href="#fn36" class="footnote-ref" id="fnref36"><sup>36</sup></a></p>
+<div id="build" class="section level4 hasAnchor" number="7.3.1.1">
+<h4><span class="header-section-number">7.3.1.1</span> Build<a href="kmedoids.html#build" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The <em>BUILD</em> phase of the algorithm consists of identifying <span class="math inline">\(k\)</span> observations
+out of the <span class="math inline">\(n\)</span> and assigning them to be cluster centers <span class="math inline">\(h\)</span>, with <span class="math inline">\(h = 1, \dots, k\)</span>.
+<span class="citation">Kaufman and Rousseeuw (<a href="references.html#ref-KaufmanRousseeuw:05">2005</a>)</span> outline a step-wise approach that starts by picking the center, say <span class="math inline">\(h_1\)</span>,
+that minimizes the overall sum of distances. This is readily accomplished by taking the observation that
+corresponds with the smallest row sum (or, equivalently, column sum) of the dissimilarity matrix.</p>
+<p>The algorithm is again illustrated with the same toy example used in the previous two chapters. This consists of the seven point coordinates listed in Figure <a href="the-k-means-algorithm.html#fig:kmeansex1">6.3</a>, with <span class="math inline">\(k=2\)</span> as the number of clusters. The corresponding
+Manhattan inter-point distance matrix is given in Figure <a href="kmedoids.html#fig:manhattand">7.3</a>. The row sums for each observation, are, respectively: 43, 32, 27, 24, 25, 37, and 33. The lowest value (24) is obtained for point 4,
+i.e., (6, 6), which is selected as the first cluster center.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:manhattand"></span>
+<img src="pics/pics25/25_04_manhattan_distance.png" alt="Manhattan Inter-Point Distance Matrix" width="70%" />
+<p class="caption">
+Figure 7.3: Manhattan Inter-Point Distance Matrix
+</p>
+</div>
+<p>Next, at each step, an additional center
+(for <span class="math inline">\(h = 2, \dots, k\)</span>) is selected that improves the objective function the most.
+This is accomplished by evaluating each of the remaining points as a potential center. The one
+is selected that results in the greatest reduction in the objective function.</p>
+<p>With the first center assigned,
+a <span class="math inline">\((n-1) \times (n-1)\)</span> submatrix of the original distance matrix is used to assess each of the remaining <span class="math inline">\(n-1\)</span> points (i.e., not including <span class="math inline">\(h_1\)</span>) as
+a potential new center. This is implemented by computing the improvement that would result for each column
+point <span class="math inline">\(j\)</span> from selecting a given row <span class="math inline">\(i\)</span> as the new center. The row (destination) for with the improvement over all
+columns (origins) is largest is selected as the new center.</p>
+<p>More specifically, in the second iteration the current distance between the
+point in column <span class="math inline">\(j\)</span> and <span class="math inline">\(h_1\)</span> is compared to the distance from <span class="math inline">\(j\)</span> to each row <span class="math inline">\(i\)</span>. If <span class="math inline">\(j\)</span> is closer to <span class="math inline">\(i\)</span> than to its current closest center, then <span class="math inline">\(d_{j,h_1} - d_{ji} &gt; 0\)</span>, the potential improvement from assigning <span class="math inline">\(j\)</span> to center <span class="math inline">\(i\)</span> instead of to its current
+closest center. In the second iteration, this is <span class="math inline">\(h_1\)</span>, but in later iterations it is more generally the closest center. Negative entries are not taken into account.</p>
+<p>The row <span class="math inline">\(i\)</span> for which the sum of the improvements over all <span class="math inline">\(j\)</span> is the greatest becomes the next center. In the example,
+with point 4 as the first center, its distance from each of the remaining six points is listed in
+the second row of Figure <a href="kmedoids.html#fig:build">7.4</a>, below the label of the point. Each of the following rows in the table gives
+the improvement in distance from the point at the top if the row point were selected as the new center, or
+<span class="math inline">\(\mbox{max}(d_{j4} - d_{ij},0)\)</span>. For example, for row 1 and column 2, that value is <span class="math inline">\(6 - d_{1,2} = 6 - 3 = 3\)</span>.
+For the other points (columns), the point 4 is closer than 2, so the corresponding matrix entries are zero, resulting in an
+overall row sum of 3 (the improvement in the objective from selecting 2 as the next center).</p>
+<p>The row sum for each potential center is given in the column labeled <em>sum</em>. There is a tie between observations 3 and 7,
+which each achieve an improvement of 6. For
+consistency with the earlier chapters, point 7 is selected as the second starting point.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:build"></span>
+<img src="pics/pics25/25_05_build.png" alt="BUILD - Step 2" width="70%" />
+<p class="caption">
+Figure 7.4: BUILD - Step 2
+</p>
+</div>
+<p>At this stage, the distance for each <span class="math inline">\(j\)</span> to its nearest center is updated and the process starts anew for the <span class="math inline">\(n-2\)</span> remaining observations. This process continues until all <span class="math inline">\(k\)</span> centers have been assigned. This provides the initial solution for the <em>SWAP</em> stage.
+Since the example only has <span class="math inline">\(k=2\)</span>, the two initial centers are points 4 and 7.</p>
+</div>
+<div id="swap" class="section level4 hasAnchor" number="7.3.1.2">
+<h4><span class="header-section-number">7.3.1.2</span> Swap<a href="kmedoids.html#swap" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>All the observations are assigned to the cluster center they are closest to. As shown in Figure <a href="kmedoids.html#fig:assign1">7.5</a>, this results in cluster 1 consisting of observations 1-5, and cluster 2 being made up of observations 6 and 7, using the distances from columns 4 and 7 in the dissimilarity matrix. The total
+distance to each cluster center equals 20, with cluster 1 contributing 17 and cluster 2, 3</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:assign1"></span>
+<img src="pics/pics25/25_06_assign1.png" alt="Cluster Assignment at end of BUILD stage" width="25%" />
+<p class="caption">
+Figure 7.5: Cluster Assignment at end of BUILD stage
+</p>
+</div>
+<p>The essence of the <em>SWAP</em> phase is to consider what happens to the overall objective when a current center (one of the <span class="math inline">\(k\)</span>) is
+swapped with one of the remaining <span class="math inline">\(n - k\)</span> non-centers. With a current center labeled as <span class="math inline">\(i\)</span> and a non-center as <span class="math inline">\(r\)</span>, this requires the evaluation of <span class="math inline">\(k \times (n-k)\)</span> possible swaps (<span class="math inline">\(i, r\)</span>).</p>
+<p>When considering the effect of replacing a center <span class="math inline">\(i\)</span> by a new center <span class="math inline">\(r\)</span>, the impact on all the remaining <span class="math inline">\(n - k -1\)</span> points must
+be considered. Those points can no longer be assigned to <span class="math inline">\(i\)</span>, so they either become part of a cluster around the new center <span class="math inline">\(r\)</span>,
+or they are re-allocated to one of the other centers <span class="math inline">\(g\)</span> (but not <span class="math inline">\(i\)</span>, since that is no longer a center).</p>
+<p>For each point <span class="math inline">\(j\)</span>, the change in distance associated with a swap <span class="math inline">\((i, r)\)</span> is labeled as <span class="math inline">\(C_{jir}\)</span>. The
+total improvement for a given swap <span class="math inline">\((i, r)\)</span> is the sum of its effect over all <span class="math inline">\(j\)</span>, <span class="math inline">\(T_{ir} = \sum_j C_{jir}\)</span>.
+This total effect is evaluated for all possible <span class="math inline">\((i, r)\)</span> pairs and the minimum is selected. If that minimum
+is also negative, the associated swap is carried out, i.e., when <span class="math inline">\(\mbox{argmin}_{i,r} T_{ir} &lt; 0\)</span>, <span class="math inline">\(r\)</span> takes
+the place of <span class="math inline">\(i\)</span>.</p>
+<p>This process is continued until no more swaps can achieve an improvement in the objective function. The computational burden associated with this algorithm is quite high, since at each iteration <span class="math inline">\(k \times (n - k)\)</span> pairs need to be evaluated. On the other hand, no calculations other than comparison and addition/subtraction
+are involved, and all the information is in the (constant) dissimilarity matrix.</p>
+<p>To compute the net change in the objective function for a point <span class="math inline">\(j\)</span> that follows from a swap between <span class="math inline">\(i\)</span> and <span class="math inline">\(r\)</span>,
+two cases can be distinguished. In one, <span class="math inline">\(j\)</span> was not assigned to center <span class="math inline">\(i\)</span>, but it belongs to a different cluster, say <span class="math inline">\(g\)</span>, such that <span class="math inline">\(d_{jg} &lt; d_{ji}\)</span>. In the other case, <span class="math inline">\(j\)</span> does initially belong to the cluster <span class="math inline">\(i\)</span>, such that <span class="math inline">\(d_{ji} &lt; d_{jg}\)</span> for all other
+centers <span class="math inline">\(g\)</span>. In both instances,
+the distances from <span class="math inline">\(j\)</span> to the nearest current center (<span class="math inline">\(i\)</span> or <span class="math inline">\(g\)</span>) must be compared to the distance to the candidate point, <span class="math inline">\(r\)</span>.</p>
+<p>The first instance, where <span class="math inline">\(j\)</span> is not part of the cluster <span class="math inline">\(i\)</span> is illustrated in Figure <a href="kmedoids.html#fig:pamswap1">7.6</a>. There are two scenarios for the
+configuration of the point <span class="math inline">\(j\)</span>, labeled <span class="math inline">\(j1\)</span> and <span class="math inline">\(j2\)</span>. Both these points are closer to <span class="math inline">\(g\)</span> than to <span class="math inline">\(i\)</span>, since they are <em>not</em> part
+of the cluster around <span class="math inline">\(i\)</span>.</p>
+<p>The key element is whether <span class="math inline">\(j\)</span> is closer
+to <span class="math inline">\(r\)</span> than to its current cluster center <span class="math inline">\(g\)</span>. If <span class="math inline">\(d_{jg} \le d_{jr}\)</span>, then nothing changes, since <span class="math inline">\(j\)</span> remains in cluster <span class="math inline">\(g\)</span>, and <span class="math inline">\(C_{jir} = 0\)</span>. This is the case for point
+<span class="math inline">\(j1\)</span>. The dashed red line gives the distance to the current center <span class="math inline">\(g\)</span> and the dashed green line gives the distance to <span class="math inline">\(r\)</span>.</p>
+<p>If <span class="math inline">\(j\)</span> is closer to the new center <span class="math inline">\(r\)</span> than to its current cluster <span class="math inline">\(g\)</span>, then <span class="math inline">\(d_{jr} &lt; d_{jg}\)</span>, as is the case for point <span class="math inline">\(j2\)</span>. As a result,
+<span class="math inline">\(j\)</span> is assigned to the new center <span class="math inline">\(r\)</span> and <span class="math inline">\(C_{jir} = d_{jr} - d_{jg}\)</span>, a negative value, which decreases the overall cost. In the figure, the length of the dashed red line must be compared to the length of the solid green line, which designates a re-assignment of <span class="math inline">\(j\)</span> to the candidate center <span class="math inline">\(r\)</span>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:pamswap1"></span>
+<img src="pics/pics25/25_07_pam_case1.png" alt="PAM SWAP Point Layout - Case 1" width="40%" />
+<p class="caption">
+Figure 7.6: PAM SWAP Point Layout - Case 1
+</p>
+</div>
+<p>The second configuration is shown in Figure <a href="kmedoids.html#fig:pamswap2">7.7</a>, where <span class="math inline">\(j\)</span> starts out as being assigned to <span class="math inline">\(i\)</span>. There are three
+possibilities for the location of <span class="math inline">\(j\)</span> relative to <span class="math inline">\(g\)</span> and <span class="math inline">\(r\)</span>. In the first case, illustrated by point <span class="math inline">\(j1\)</span>, <span class="math inline">\(j\)</span> is closer to <span class="math inline">\(g\)</span> than to <span class="math inline">\(r\)</span>. This is illustrated by the difference in length between the dashed green line (<span class="math inline">\(d_{j1r}\)</span>) and the solid green line (<span class="math inline">\(d_{j1g}\)</span>). More
+precisely, <span class="math inline">\(d_{jr} \geq d_{jg}\)</span> so that <span class="math inline">\(j\)</span> is now
+assigned to <span class="math inline">\(g\)</span>. The change in the objective is
+<span class="math inline">\(C_{jir} = d_{jg} - d_{ji}\)</span>. This value is positive, since <span class="math inline">\(j\)</span> was part of cluster <span class="math inline">\(i\)</span> and thus was closer to <span class="math inline">\(i\)</span> than to <span class="math inline">\(g\)</span>
+(compare the length of the red dashed line between <span class="math inline">\(j1\)</span> and <span class="math inline">\(i\)</span> and the length of the line connecting <span class="math inline">\(j1\)</span> to <span class="math inline">\(g\)</span>).</p>
+<p>If <span class="math inline">\(j\)</span> is closer to <span class="math inline">\(r\)</span>, then <span class="math inline">\(d_{jr} &lt; d_{jg}\)</span>. There are two possible layouts, one depicted by <span class="math inline">\(j2\)</span>, the other
+by <span class="math inline">\(j3\)</span>. In both instances, the result is that
+<span class="math inline">\(j\)</span> is
+assigned to <span class="math inline">\(r\)</span>, but the effect on the objective differs.</p>
+<p>In the Figure, for both <span class="math inline">\(j2\)</span> and <span class="math inline">\(j3\)</span> the dashed green line to <span class="math inline">\(g\)</span> is
+longer than the solid green line to <span class="math inline">\(r\)</span>. The change in the objective
+is the difference between the new distance and the old one (<span class="math inline">\(d_{ji}\)</span>), or
+<span class="math inline">\(C_{jir} = d_{jr} - d_{ji}\)</span>. This value could be either positive or negative, since what matters is that <span class="math inline">\(j\)</span> is closer to
+<span class="math inline">\(r\)</span> than to <span class="math inline">\(g\)</span>, irrespective of how close <span class="math inline">\(j\)</span> might have been to <span class="math inline">\(i\)</span>. For point <span class="math inline">\(j2\)</span>, the distance to <span class="math inline">\(i\)</span> (dashed red line)
+was smaller than the new distance to <span class="math inline">\(r\)</span> (solid green line), so <span class="math inline">\(d_{jr} - d_{ji} &gt; 0\)</span>. In the case of <span class="math inline">\(j3\)</span>, the opposite
+holds, and the length to <span class="math inline">\(i\)</span> (dashed red line) is larger than the distance to the new center (solid green line). In this
+case, the change to the objective is <span class="math inline">\(d_{jr} - d_{ji} &lt; 0\)</span>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:pamswap2"></span>
+<img src="pics/pics25/25_08_pam_case2.png" alt="PAM SWAP Point Layout - Case 2" width="40%" />
+<p class="caption">
+Figure 7.7: PAM SWAP Point Layout - Case 2
+</p>
+</div>
+<p>In the example, the first step in the swap procedure consists of evaluating whether center 4 or center 7 can be replaced
+by any of the current non-centers, i.e., 1, 2, 3, 5, or 6. The comparison involves three distances for each
+point: the distance
+to the closest center, the distance to the second closest center, and the distance to the candidate center.
+In the toy example, this is greatly simplified, since there are only two centers, with distances <span class="math inline">\(d_{j4}\)</span> and
+<span class="math inline">\(d_{j7}\)</span> for each non-candidate and non-center point <span class="math inline">\(j\)</span>. In addition, the distance to the candidate
+center <span class="math inline">\(d_{jr}\)</span> is needed, where each non-center point is in turn considered as a candidate (<span class="math inline">\(r\)</span>).</p>
+<p>All the evaluations for the first step are included in Figure <a href="kmedoids.html#fig:swapstep1">7.8</a>. There are five main panels,
+one for each current non-center point. The rows in each panel are the non-center, non-candidate points.
+For example, in the top panel, 1 is considered a candidate, so the rows pertain to 2, 3, 5, and 6.
+Columns 3-4 give the distance to, respectively, center 4 (<span class="math inline">\(d_{j4}\)</span>), center 7 (<span class="math inline">\(d_{j7}\)</span>) and candidate center 1 (<span class="math inline">\(d_{j1}\)</span>).</p>
+<p>Columns 5 and 6 give the contribution of each row to the objective with point 1 replacing, respectively 4 (<span class="math inline">\(C_{j41}\)</span>) and
+7 (<span class="math inline">\(C_{j71}\)</span>). In the scenario of replacing point 4 by point 1, the distances from point 2 to 4 and 7 are 6 and 9, so point 2 is closest to center 4. As a result 2 will be allocated to either the new candidate center 1 or the current center 7. It is closest to the new center (distance 3 relative to 9). The decrease in the objective from assigning 2 to 1 rather than 4 is 3 - 6 = -3, the entry in the
+column <span class="math inline">\(C_{j41}\)</span>.</p>
+<p>Identical calculations are carried out to compute the contribution of 2 to the replacement of 7 by 1. Since 2 is closer to 4, this is the situation where a point is <em>not</em> closest to the center that is to be replaced. The assessment is whether point 2 would stay with its current center (4) or move to the candidate. Since 2 is closer to 1 than to 4, the gain from the swap is again -3, entered
+under <span class="math inline">\(C_{j71}\)</span>. In the same way, the contributions are computed for each of the other non-center and non-candidate points. The sum of
+the contributions is listed in the row labeled <span class="math inline">\(T\)</span>. For a replacement of 4 by 1, the sum of -3, 1, 1, and 0 gives -1 as the
+value of <span class="math inline">\(T_{41}\)</span>. Similarly, the value of <span class="math inline">\(T_{47}\)</span> is the sum of -3, 0, 0, and 1, or -2.</p>
+<p>The remaining panels show the results when each of the other current non-centers is evaluated
+as a center candidate. The minimum value over all pairs <span class="math inline">\(i,r\)</span> is obtained for <span class="math inline">\(T_{43} = -5\)</span>. This suggests that center 4 should
+be replaced by point 3 (there is actually a tie with <span class="math inline">\(T_{73}\)</span>, so
+in each case 3 should enter the center set; in the example, it replaces 4). The improvement in the overall objective function from this step
+is -5.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:swapstep1"></span>
+<img src="pics/pics25/25_09_swap1.png" alt="PAM SWAP Cost Changes - Step 1" width="50%" />
+<p class="caption">
+Figure 7.8: PAM SWAP Cost Changes - Step 1
+</p>
+</div>
+<p>This process is repeated in Figure <a href="kmedoids.html#fig:swapstep2">7.9</a>, but now using <span class="math inline">\(d_{j3}\)</span> and <span class="math inline">\(d_{j7}\)</span> as reference
+distances. The smallest value for <span class="math inline">\(T\)</span> is found for <span class="math inline">\(T_{75} = -2\)</span>, which is also the improvement
+to the objective function (note that the improvement is smaller than for the first step, something
+that is to be expected from a gradient descent method). This suggests that 7 should be replaced by 5.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:swapstep2"></span>
+<img src="pics/pics25/25_10_swap2.png" alt="PAM SWAP Cost Changes - Step 2" width="50%" />
+<p class="caption">
+Figure 7.9: PAM SWAP Cost Changes - Step 2
+</p>
+</div>
+<p>In the next step, shown in Figure <a href="kmedoids.html#fig:swapstep3">7.10</a>, the calculations are repeated, using <span class="math inline">\(d_{j3}\)</span> and <span class="math inline">\(d_{j5}\)</span> as the distances. The smallest
+value for <span class="math inline">\(T\)</span> is found for <span class="math inline">\(T_{32} = -1\)</span>, suggesting that 3 should be replaced by 2. The improvement in
+the objective is -1 (again, smaller than in the previous step).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:swapstep3"></span>
+<img src="pics/pics25/25_11_swap3.png" alt="PAM SWAP Cost Changes - Step 3" width="50%" />
+<p class="caption">
+Figure 7.10: PAM SWAP Cost Changes - Step 3
+</p>
+</div>
+<p>In the last step, shown in Figure <a href="kmedoids.html#fig:swapstep4">7.11</a>, everything is recalculated for <span class="math inline">\(d_{j2}\)</span> and <span class="math inline">\(d_{j5}\)</span>. At this stage, none of the <span class="math inline">\(T\)</span> yield
+a negative value, so the algorithm has reached a local optimum and stops.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:swapstep4"></span>
+<img src="pics/pics25/25_12_swap4.png" alt="PAM SWAP Cost Changes - Step 4" width="50%" />
+<p class="caption">
+Figure 7.11: PAM SWAP Cost Changes - Step 4
+</p>
+</div>
+<p>The final result consists of a cluster of three elements, with observations 1 and 3 centered on 2, and a cluster of four elements,
+with observations 4, 6 and 7 centered on 5. As Figure <a href="kmedoids.html#fig:swapfinal">7.12</a> illustrates, both clusters contribute 6 to the total sum of deviations,
+for a final value of 12. This also turns out to be 20 - 5 - 2 - 1, or the total effect of each swap on the
+objective function.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:swapfinal"></span>
+<img src="pics/pics25/25_13_swap_final.png" alt="PAM SWAP Final Assignment" width="25%" />
+<p class="caption">
+Figure 7.12: PAM SWAP Final Assignment
+</p>
+</div>
+</div>
+</div>
+<div id="improving-on-the-pam-algorithm" class="section level3 hasAnchor" number="7.3.2">
+<h3><span class="header-section-number">7.3.2</span> Improving on the PAM Algorithm<a href="kmedoids.html#improving-on-the-pam-algorithm" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The complexity of each iteration in the original PAM algorithm is of the order <span class="math inline">\(k \times (n - k)^2\)</span>, which means
+it will not scale well to large data sets with potentially large values of <span class="math inline">\(k\)</span>. To address this issue, several
+refinements have been proposed. The most familiar ones are CLARA, CLARANS and LAB.</p>
+<div id="clara" class="section level4 hasAnchor" number="7.3.2.1">
+<h4><span class="header-section-number">7.3.2.1</span> CLARA<a href="kmedoids.html#clara" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p><span class="citation">Kaufman and Rousseeuw (<a href="references.html#ref-KaufmanRousseeuw:05">2005</a>)</span> proposed the algorithm CLARA, based on a sampling strategy.
+Instead of considering the
+full data set, a subsample is drawn. Then the PAM algorithm is applied to find the
+best <span class="math inline">\(k\)</span> medoids in the sample. Finally, the distance from all observations (not just those in the sample) to their closest medoid is computed
+to assess the overall quality of the clustering.</p>
+<p>The sampling process can be repeated for several more samples (keeping the best solution
+from the previous iteration as part of the sampled observations), and at the end the best solution is selected. While
+easy to implement, this approach does not guarantee that the best local optimum solution is found. In fact, if one of the
+best medoids is never sampled, it is impossible for it to become part of the final solution. Note that as the size of the
+sample becomes closer to the size of the full data set, the results will tend to be similar to those given by PAM.<a href="#fn37" class="footnote-ref" id="fnref37"><sup>37</sup></a></p>
+<p>In practical applications, <span class="citation">Kaufman and Rousseeuw (<a href="references.html#ref-KaufmanRousseeuw:05">2005</a>)</span> suggest to use
+a sample size of 40 + 2k and to repeat the process 5 times.<a href="#fn38" class="footnote-ref" id="fnref38"><sup>38</sup></a></p>
+</div>
+<div id="clarans" class="section level4 hasAnchor" number="7.3.2.2">
+<h4><span class="header-section-number">7.3.2.2</span> CLARANS<a href="kmedoids.html#clarans" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>In <span class="citation">Ng and Han (<a href="references.html#ref-NgHan:02">2002</a>)</span>, a different sampling strategy is outlined that keeps the full set of observations
+under consideration. The problem is formulated as finding the best node in a graph that consists
+of all possible combinations of <span class="math inline">\(k\)</span> observations that could serve as the <span class="math inline">\(k\)</span> medoids. The nodes
+are connected by edges to the <span class="math inline">\(k \times (n - k)\)</span> nodes that differ in one medoid (i.e., for each
+edge, one of the <span class="math inline">\(k\)</span> medoid nodes is swapped with one of the <span class="math inline">\(n - k\)</span> candidates).</p>
+<p>The algorithm CLARANS starts an iteration by randomly picking a node (i.e., a set of <span class="math inline">\(k\)</span> candidate medoids). Then, it
+randomly picks a neighbor of this node in the graph. This is a set of <span class="math inline">\(k\)</span> medoids where one is swapped
+with the current set. If this leads to an improvement in the cost, then the new node becomes the new
+start of the next set of searches (still part of the same iteration). If not, another neighbor is picked and evaluated, up to <em>maxneighbor</em>
+times. This ends an iteration.</p>
+<p>At the end of the iteration the cost of the last solution is compared to the stored current <em>best</em>. If the
+new solution constitutes an improvement, it becomes the new <em>best</em>. This search process
+is carried out a total of <em>numlocal</em> iterations and at the end the best overall solution is kept. Because of the special
+nature of the graph, not that many steps are required to achieve a local minimum (technically, there are many
+paths that lead to the local minimum, even when starting at a random node).</p>
+<p>Again, this can be illustrated by means of the toy example.
+To construct <span class="math inline">\(k=2\)</span> clusters, any pair of 2 observations from the 7 could be considered a potential medoid. All
+those pairs constitute the nodes in the graph. The total number of nodes is given by the binomial coefficient
+<span class="math inline">\({n}\choose{k}\)</span>. In the example, <span class="math inline">\({{7}\choose{2}} = 21\)</span>.</p>
+<p>Each of the 21 nodes in the graph has <span class="math inline">\(k \times (n - k) = 2 \times 5 = 10\)</span> <em>neighbors</em> that differ only
+in one medoid connected with an edge.
+For example, the initial node corresponding to (4,7) will be connected to all the nodes that differ by one medoid, i.e., either 4 or 7 is replaced (<em>swapped</em> in
+PAM terminology) by one of the <span class="math inline">\(n - k = 5\)</span> remaining nodes. Specifically, this includes the following
+10 neighbors: 1-7, 2-7, 3-7, 5-7, 6-7, and 4-1, 4-2, 4-3, 4-5 and 4-6. Rather than evaluating all 10 potential swaps,
+as in PAM, only a maximum number (<em>maxneighbor</em>) are evaluated. At the end of those evaluations, the best
+solution is kept. Then the process is repeated, up to the specified total number of iterations, which <span class="citation">Ng and Han (<a href="references.html#ref-NgHan:02">2002</a>)</span> call
+<em>numlocal</em>.</p>
+<p>With <em>maxneighbors</em> set to 2, the first step of the random evaluation could be to <em>randomly</em> pick the pair 4-5
+from the neighboring nodes. In other words, 7 in the original set is replaced by 5.
+Using the values from the worked example above, we have <span class="math inline">\(T_{45} = 3\)</span>, a positive value, so this does not improve the
+objective function. The iteration count is increased (for <em>maxneighbors</em>) and a second random node is picked, e.g., 4-2 (i.e.,
+replacing 7 by 2).
+At this stage, the value <span class="math inline">\(T_{42} = -3\)</span>, so the objective is improved to 20-3 = 17. Since the end of <em>maxneighbors</em> has been reached,
+this value is stored as <em>best</em> and the process is repeated with a different random starting point. This is continued
+until <em>numlocal</em> local optima have been obtained. At that point, the best overall solution is kept.</p>
+<p>Based on several numerical experiments, <span class="citation">Ng and Han (<a href="references.html#ref-NgHan:02">2002</a>)</span> suggest that no more than 2 iterations need to be pursued (i.e., <em>numlocal</em> = 2),
+with some evidence that more operations are not cost-effective. They also suggest a sample size of 1.25% of <span class="math inline">\(k \times (n-k)\)</span>.<a href="#fn39" class="footnote-ref" id="fnref39"><sup>39</sup></a></p>
+<p>Both CLARA and CLARANS are large data methods, since for smaller data sizes (e.g., <span class="math inline">\(n &lt; 100\)</span>), PAM will be feasible and obtain
+better solutions (since it implements an exhaustive evaluation).</p>
+<p>Further speedup of PAM, CLARA and CLARANS is outlined in <span class="citation">Schubert and Rousseeuw (<a href="references.html#ref-SchubertRousseeuw:19">2019</a>)</span>, where some redundancies in the comparison
+of distances in the SWAP phase are removed. In essence, this exploits the fact that observations allocated to a medoid that will be swapped out, will move
+to either the second closest medoid or to the swap point. Observations that are not currently allocated to the medoid under
+consideration will either stay in their current cluster, or move to the swap point, depending on how the distance to
+their cluster center compares to the distance to the swap point. These ideas shorten the number of loops that need to be
+evaluated and allow the algorithms to scale to much larger problems <span class="citation">(details are in <a href="references.html#ref-SchubertRousseeuw:19">Schubert and Rousseeuw 2019, 175</a>)</span>. In addition, they provide
+and option to
+carry out the swaps for all current k medoids simultaneously, similar to the logic in K-Means, implemented
+in the FASTPAM2 algorithm <span class="citation">(see <a href="references.html#ref-SchubertRousseeuw:19">Schubert and Rousseeuw 2019, 178</a>)</span>.</p>
+</div>
+<div id="lab" class="section level4 hasAnchor" number="7.3.2.3">
+<h4><span class="header-section-number">7.3.2.3</span> LAB<a href="kmedoids.html#lab" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>A second type of improvement in the algorithm pertains to the BUILD phase. The original approach is replaced by a so-called
+<em>Linear Approximative BUILD</em> (LAB), which achieves linear runtime in <span class="math inline">\(n\)</span>. Instead of considering all candidate points, only
+a subsample from the data is used, repeated <span class="math inline">\(k\)</span> times (once for each medoid).</p>
+<p>The FastPAM2 algorithm tends to yield the best cluster results relative to the other methods, in terms of the smallest sum of distances to the respective
+medoids. However, especially for large <span class="math inline">\(n\)</span> and large <span class="math inline">\(k\)</span>, FastCLARANS yields much smaller
+compute times, although the quality of the clusters is not as good as for FastPAM2. FastCLARA is always much slower than the other two.
+In terms of the initialization methods, LAB tends to be much faster than BUILD, especially for larger <span class="math inline">\(n\)</span> and <span class="math inline">\(k\)</span>.</p>
+</div>
+</div>
+<div id="kmedoidsimplementation" class="section level3 hasAnchor" number="7.3.3">
+<h3><span class="header-section-number">7.3.3</span> Implementation<a href="kmedoids.html#kmedoidsimplementation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>K-Medoids clustering is invoked from the drop down list associated with the cluster toolbar icon, as the third item in the
+classic clustering methods subset, part of the full list shown in Figure <a href="topics-covered-4.html#fig:kmeansicon">6.1</a>. It can also be selected from the menu as <strong>Clusters &gt; K Medoids</strong>.</p>
+<p>This brings up the <strong>KMedoids Clustering Settings</strong> dialog. This dialog has an almost identical structure to the one for K-Medians, with a left hand panel to select the variables and specify the cluster parameters, and a right hand panel that lists the <strong>Summary</strong> results.</p>
+<p>The method is illustrated with the <em>Chicago SDOH</em> sample data set. However, unlike the examples for K-Means and K-Medians, the variables selected are the X and Y coordinates of the census tracts. This showcases the location-allocation aspect of the K-Medoids method.</p>
+<p>In the variable selection interface, the drop down list contains <strong>&lt;X-Centroids&gt;</strong> and <strong>&lt;Y-Centroids&gt;</strong> as available variables, even when those coordinates have not been computed explicitly. They are included to facilitate the implementation of the spatially constrained clustering methods in Part III. The data layer is projected, with the coordinates expressed in feet, which makes for rather large numbers.</p>
+<p>The default setup is to use the <strong>Standardize (Z)</strong> transformation, with the <strong>FastPAM</strong> algorithm using the <strong>LAB</strong> initialization. The distance function is set to <strong>Manhattan</strong>. As before, the number of clusters is chosen as <strong>8</strong>.
+There are no other options to be set, since the PAM algorithm proceeds with an exhaustive
+search in the SWAP phase, after the initial <span class="math inline">\(k\)</span> medoids are selected.</p>
+<p>Invoking <strong>Run</strong> populates the <strong>Summary</strong> panel with properties of the cluster solution and brings up a separate window with the cluster map. The cluster classification are saved as an integer variable with the specified <strong>Field</strong> name.</p>
+<div id="cluster-results-1" class="section level4 hasAnchor" number="7.3.3.1">
+<h4><span class="header-section-number">7.3.3.1</span> Cluster results<a href="kmedoids.html#cluster-results-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The cluster characteristics are shown in Figure <a href="kmedoids.html#fig:medoidsummary">7.13</a>.
+Below the usual listing of methods and options, the <em>observation numbers</em> of the eight
+cluster medoids are given. These can be used to select the corresponding observations in the table. As before, the values for the different variables in
+each cluster center are listed, but now these correspond to actual observations. However, in the current application, the X and Y centroids are not part of the data table, unless they were added explicitly.</p>
+<p>The customary sum of squares measures are included for completeness, but as pointed out in the discussion of K-Medians, these
+do not match the criteria used in the objective function. Nevertheless, the BSS/TSS ratio of 0.870416 shows a good separation
+between the eight clusters. Since the mean of the coordinates is close to the centroid, this ratio is actually not a totally
+inappropriate metric. However, in contrast to the objective function used, the distances are Euclidean and not Manhattan block
+distances.</p>
+<p>The latter are employed in the calculation of the within-cluster sum of distances. As for K-Medians, both the total distance per cluster as well as the average are listed. The most compact cluster is C8, with an average distance of 0.413. The least compact cluster is C6, with an average of 0.745, closely followed by C2 (0.702). The ratio of within to total sum of the distances indicates a significant reduction to 0.34 of the original.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:medoidsummary"></span>
+<img src="pics/pics25/25_14_medoidsummary.png" alt="Summary, K-Medoids, k=8" width="50%" />
+<p class="caption">
+Figure 7.13: Summary, K-Medoids, k=8
+</p>
+</div>
+<p>The spatial layout of the clusters is shown in the cluster map in Figure <a href="kmedoids.html#fig:medoidmap">7.14</a>. In addition to the cluster membership for each tract, the cluster centers (medoid) are highlighted in black on the map. These are shown as tract polygons, although the actual cluster exercise was carried out for the tract centroids (points).<a href="#fn40" class="footnote-ref" id="fnref40"><sup>40</sup></a></p>
+<p>The clusters show the optimal allocation of the 791 census tracts to 8 centers. The result is the most balanced of the cluster groupings obtained so far, with the four largest clusters consisting of between 114 and 105 tracts, and the four smallest between 95 and 79. In addition, the clusters are almost perfectly spatially contiguous, even though K-Medoids is a non-spatial clustering method. This illustrates the application of standard clustering methods to location coordinates to delineate regions in space, a topic that is
+revisited in Chapter <a href="CHspatialclassicclustering.html#CHspatialclassicclustering">9</a>.</p>
+<p>The one <em>outlier</em> tract that belongs to cluster 2 may seem to be a mistake, since it seems closer to the center of cluster 1 than to that of cluster 2, to which it has been assigned. However, the distances used in the algorithm are not straight line, but Manhattan distances. This case involves an instance where the centroid of the tract involved is almost directly south of the cluster 2 center, thus involving only a distance in the north-south direction. In the example, it turns out to be slightly smaller than than the block distance required to reach the center of cluster 1.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:medoidmap"></span>
+<img src="pics/pics25/25_15_medoidmap.png" alt="K-Medoids Cluster Map, k=8" width="60%" />
+<p class="caption">
+Figure 7.14: K-Medoids Cluster Map, k=8
+</p>
+</div>
+</div>
+</div>
+<div id="options-and-sensitivity-analysis-1" class="section level3 hasAnchor" number="7.3.4">
+<h3><span class="header-section-number">7.3.4</span> Options and Sensitivity Analysis<a href="kmedoids.html#options-and-sensitivity-analysis-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The main option for K-Medoids is the choice of the <strong>Method</strong>. In addition to the default <strong>FastPAM</strong>, the algorithms <strong>FastCLARA</strong> and
+<strong>FastCLARANS</strong> are available as well. The latter two are large data methods. They will always
+perform (much) worse than FastPAM in small to medium-sized data sets.</p>
+<p>In addition, there is a choice of <strong>Initialization Method</strong> between <strong>LAB</strong> and <strong>BUILD</strong>. In most
+circumstances, LAB is the preferred option, but BUILD is included for the sake of completeness and
+to allow for a full range of comparisons.</p>
+<p>Each of these options has its own set of parameters.</p>
+<div id="clara-parameters" class="section level4 hasAnchor" number="7.3.4.1">
+<h4><span class="header-section-number">7.3.4.1</span> CLARA parameters<a href="kmedoids.html#clara-parameters" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The two main parameters that need to be specified for the CLARA method are the number of samples considered
+(by default set to 2) and the sample size. In addition, there is an option to include the best previous medoids in the
+sample.</p>
+</div>
+<div id="clarans-parameters" class="section level4 hasAnchor" number="7.3.4.2">
+<h4><span class="header-section-number">7.3.4.2</span> CLARANS parameters<a href="kmedoids.html#clarans-parameters" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>For CLARANS, the two relevant parameters pertain to the number of iterations and the sample rate. The former corresponds to the <em>numlocal</em> parameter in <span class="citation">Ng and Han (<a href="references.html#ref-NgHan:02">2002</a>)</span>,
+i.e., the number of times a local optimum is computed (default = 2). The sample rate pertains to the maximum number
+of <em>neighbors</em> that will be randomly sampled in each iteration (<em>maxneighbors</em> in the paper). This is
+expressed as a fraction of <span class="math inline">\(k \times (n - k)\)</span>. The default is to use the value of 0.025 recommended by <span class="citation">Schubert and Rousseeuw (<a href="references.html#ref-SchubertRousseeuw:19">2019</a>)</span>, which would
+yield a maximum neighbors of 20 (0.025 x 791) for each iteration in the Chicago example. Unlike PAM and CLARA, there is no
+initialization option.</p>
+<p>CLARANS is a large data method and is optimized for speed (especially with large <span class="math inline">\(n\)</span> and large <span class="math inline">\(k\)</span>). It should not be used in smaller samples, where the exhaustive search carried out by PAM can be computed in a reasonable time.</p>
+
+</div>
+</div>
+</div>
+<!-- </div> -->
+<div class="footnotes">
+<hr />
+<ol start="34">
+<li id="fn34"><p>Strictly speaking, k-medoids
+minimizes the average distance to the representative center, but the sum
+is easier for computational reasons.<a href="kmedoids.html#fnref34" class="footnote-back">↩︎</a></p></li>
+<li id="fn35"><p>Location-allocation problems are typically solved by means of integer programming or
+specialized heuristics, see, e.g., <span class="citation">Church and Murray (<a href="references.html#ref-ChurchMurray:09">2009</a>)</span>, Chapter 11.<a href="kmedoids.html#fnref35" class="footnote-back">↩︎</a></p></li>
+<li id="fn36"><p>Detailed descriptions are given
+in <span class="citation">Kaufman and Rousseeuw (<a href="references.html#ref-KaufmanRousseeuw:05">2005</a>)</span>, Chapters 2 and 3, as well as in <span class="citation">Hastie, Tibshirani, and Friedman (<a href="references.html#ref-Hastieetal:09">2009</a>)</span>, pp. 515-520, and <span class="citation">Han, Kamber, and Pei (<a href="references.html#ref-Hanetal:12">2012</a>)</span>, pp. 454-457.<a href="kmedoids.html#fnref36" class="footnote-back">↩︎</a></p></li>
+<li id="fn37"><p>Clearly, with a sample
+size of 100%, CLARA becomes the same as PAM.<a href="kmedoids.html#fnref37" class="footnote-back">↩︎</a></p></li>
+<li id="fn38"><p>More precisely, the first sample consists of 40 + 2k
+random points. From the second sample on, the best k medoids found in a previous iteration are included, so that
+there are 40 + k additional random points. Also, in <span class="citation">Schubert and Rousseeuw (<a href="references.html#ref-SchubertRousseeuw:19">2019</a>)</span>, they suggested to use 80 + 4k
+and 10 repetitions for larger data sets. In the implementation in <code>GeoDa</code>, the latter is used for data
+sets larger than 100.<a href="kmedoids.html#fnref38" class="footnote-back">↩︎</a></p></li>
+<li id="fn39"><p><span class="citation">Schubert and Rousseeuw (<a href="references.html#ref-SchubertRousseeuw:19">2019</a>)</span> also consider 2.5% in larger data sets with 4 iterations instead of 2.<a href="kmedoids.html#fnref39" class="footnote-back">↩︎</a></p></li>
+<li id="fn40"><p>The map was created by first saving the selected cluster centers to a separate shape file and then using <code>the</code>GeoDa`’s multilayer functionality to superimpose the centers on the cluster map.<a href="kmedoids.html#fnref40" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="k-medians.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="CHSpectralClustering.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/yihui/bookdown-crc/edit/master/24a.AdvancedClustering.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
